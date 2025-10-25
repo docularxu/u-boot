@@ -362,9 +362,11 @@
 			compatible = "spacemit,k1-syscon-apbc";
 			reg = <0x0 0xd4015000 0x0 0x1000>;
 			clocks = <&osc_32k>, <&vctcxo_1m>, <&vctcxo_3m>,
-				 <&vctcxo_24m>;
+				 <&vctcxo_24m>, <&syscon_mpmu CLK_SLOW_UART1>,
+				 <&syscon_mpmu CLK_PLL1_12P8>, <&syscon_mpmu CLK_PLL1_6P4>;
 			clock-names = "osc", "vctcxo_1m", "vctcxo_3m",
-				      "vctcxo_24m";
+				      "vctcxo_24m", "slow_uart1_14p74",
+				      "pll1_d192_12p8", "pll1_d384_6p4";
 			#clock-cells = <1>;
 			#reset-cells = <1>;
 		};
@@ -579,9 +581,9 @@
 			compatible = "spacemit,k1-syscon-mpmu";
 			reg = <0x0 0xd4050000 0x0 0x209c>;
 			clocks = <&osc_32k>, <&vctcxo_1m>, <&vctcxo_3m>,
-				 <&vctcxo_24m>;
+				 <&vctcxo_24m>, <&pll CLK_PLL1_D8>;
 			clock-names = "osc", "vctcxo_1m", "vctcxo_3m",
-				      "vctcxo_24m";
+				      "vctcxo_24m", "pll1_d8";
 			#clock-cells = <1>;
 			#power-domain-cells = <1>;
 			#reset-cells = <1>;

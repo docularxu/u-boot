@@ -41,7 +41,7 @@
 };
 
 &uart0 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&uart0_2_cfg>;
+	// pinctrl-names = "default";
+	// pinctrl-0 = <&uart0_2_cfg>;
 	status = "okay";
 };

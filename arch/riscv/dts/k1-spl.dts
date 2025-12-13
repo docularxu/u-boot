@@ -5,6 +5,7 @@
  */
 
 /dts-v1/;
+
 #include "k1.dtsi"
 #include "binman.dtsi"
 
@@ -42,7 +43,6 @@
 	bootph-pre-ram;
 };
 
-
 &soc {
 	bootph-all;
 	system-controller@d4015000 {
@@ -63,6 +63,33 @@
 	system-controller@d4282800 {
 		status = "okay";
 		bootph-all;
+		bootph-pre-ram;
+	};
+
+	i2c@d4012000 {		/* i2c2 */
+		status = "okay";
+		bootph-pre-ram;
+		eeprom: eeprom {
+			compatible = "atmel,24c02";
+			reg = <0x50>;
+			status = "okay";
+			bootph-pre-ram;
+		};
+	};
+
+	i2c@d401d800 {		/* i2c8 */
+		status = "okay";
+		bootph-pre-ram;
+		pmic@41 {
+			compatible = "pmic";
+			reg = <0x41>;
+			status = "okay";
+			bootph-pre-ram;
+		};
+	};
+
+	reset-controller@d4050000 {
+		status = "okay";
 		bootph-pre-ram;
 	};
 };

@@ -22,4 +22,12 @@ config BOARD_SPECIFIC_OPTIONS
 	def_bool y
 	select SPACEMIT_K1
 
+config SPL_DDR_FIRMWARE_OFFSET
+	hex "DDR firmware offset in SPL image"
+	depends on SPL
+	default 0x20000
+	help
+	  Offset where DDR firmware should be placed in the SPL
+	  image.
+
 endif

@@ -7,6 +7,7 @@
 /dts-v1/;
 
 #include "k1.dtsi"
+#include "k1-spm8821.dtsi"
 
 / {
 	model = "spacemit k1 spl";
@@ -113,9 +114,10 @@
 	i2c@d401d800 {		/* i2c8 */
 		status = "okay";
 		bootph-pre-ram;
-		pmic@41 {
-			compatible = "pmic";
+		spm8821: pmic {
+			compatible = "spacemit,spm8821";
 			reg = <0x41>;
+			//bus = <8>;
 			status = "okay";
 			bootph-pre-ram;
 		};

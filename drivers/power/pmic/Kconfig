@@ -433,6 +433,23 @@ config PMIC_RAA215300
 	  support and several voltage regulators. For now, this driver simply
 	  allows register access and will bind the sysreset driver
 	  (CONFIG_SYSRESET_RAA215300) if it is enabled.
+
+config PMIC_SPM8821
+	bool "Enable driver for Spacemit SPM8821 power management chip"
+	depends on DM_PMIC
+	help
+	  The SPM8821 PMIC integrates multiple functions including
+	  voltage regulators, a watchdog timer, GPIO interfaces, and a
+	  real-time clock.
+
+config SPL_PMIC_SPM8821
+	bool "Enable driver for Spacemit SPM8821 power management chip in SPL"
+	depends on SPL_DM_PMIC
+	help
+	  The SPM8821 PMIC integrates multiple functions including
+	  voltage regulators, a watchdog timer, GPIO interfaces, and a
+	  real-time clock.
+
 endif
 
 config PMIC_TPS65217

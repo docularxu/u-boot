@@ -4,6 +4,7 @@
  */
 
 #include <asm/io.h>
+#include <binman_sym.h>
 #include <clk.h>
 #include <clk-uclass.h>
 #include <configs/k1.h>
@@ -12,6 +13,7 @@
 #include <dt-bindings/pinctrl/k1-pinctrl.h>
 #include <i2c.h>
 #include <linux/delay.h>
+#include <power/regulator.h>
 #include <spl.h>
 #include <tlv_eeprom.h>
 
@@ -126,6 +128,65 @@ void serial_early_init(void)
 		panic("Serial uclass init failed: %d\n", ret);
 }
 
+static void set_vdd_core(void)
+{
+	struct udevice *dev;
+	int ret;
+
+	ret = regulator_get_by_platname("vdd_core", &dev);
+	if (ret)
+		printf("Fail to detect vdd_core (%d)\n", ret);
+	ret = regulator_get_value(dev);
+	printf("vdd_core, value:%d\n", ret);
+}
+
+static void set_vdd_1v8(void)
+{
+	struct udevice *dev;
+	int ret;
+
+	ret = regulator_get_by_platname("vdd_1v8", &dev);
+	if (ret)
+		printf("Fail to detect vdd_1v8 (%d)\n", ret);
+	ret = regulator_get_value(dev);
+	printf("vdd_1v8, value:%d\n", ret);
+}
+
+static void set_vdd_mmc(void)
+{
+	struct udevice *dev;
+	int ret;
+
+	ret = regulator_get_by_platname("vdd_1v8_mmc", &dev);
+	if (ret)
+		printf("Fail to detect vdd_1v8_mmc (%d)\n", ret);
+	ret = regulator_get_value(dev);
+	printf("vdd_1v8_mmc, value:%d\n", ret);
+}
+
+void pmic_init(void)
+{
+	struct udevice *pmic_dev;
+	int ret;
+
+	ret = uclass_get_device(UCLASS_PMIC, 0, &pmic_dev);
+	if (ret)
+		panic("Fail to detect PMIC (%d)\n", ret);
+	set_vdd_1v8();
+	set_vdd_mmc();
+	set_vdd_core();
+}
+
+void ddr_init(void)
+{
+	void __iomem *addr;
+
+	addr = (void __iomem *)(CONFIG_SPL_TEXT_BASE);
+	addr += CONFIG_SPL_DDR_FIRMWARE_OFFSET;
+	// verify DDR firmware header
+	printf("[0x%x]:0x%x\n", (uint)(u64)addr, readl(addr));
+}
+
 void board_init_f(ulong dummy)
 {
 	u8 i2c_buf[I2C_BUF_SIZE];
@@ -144,11 +205,13 @@ void board_init_f(ulong dummy)
 	preloader_console_init();
 
 	i2c_early_init();
+	ddr_init();
 	ret = read_product_name(i2c_buf, I2C_BUF_SIZE);
 	if (ret)
-		panic("Fail to detect board:%d\n", ret);
+		printf("Fail to detect board:%d\n", ret);
 	else
 		printf("Get board name:%s\n", (char *)i2c_buf);
+	pmic_init();
 }
 
 u32 spl_boot_device(void)
@@ -156,16 +219,6 @@ u32 spl_boot_device(void)
 	return BOOT_DEVICE_NOR;
 }
 
-void pmic_init(void)
-{
-	struct udevice *pmic_dev = NULL;
-	int ret;
-
-	ret = uclass_get_device(UCLASS_PMIC, 0, &pmic_dev);
-	printf("%s: ret:%d\n", __func__, ret);
-}
-
 void spl_board_init(void)
 {
-	pmic_init();
 }

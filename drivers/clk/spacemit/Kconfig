@@ -16,4 +16,11 @@ config CLK_SPACEMIT_K1
 	help
 	  This enables support clock driver for SpacemiT K1 SoC.
 
+config SPL_CLK_SPACEMIT_K1
+	bool "Enable Spacemit K1 SoC clock support in SPL"
+	select SPL_CLK_CCF
+	default SPACEMIT_K1
+	help
+	  It allows to use clock driver in SPL.
+
 endif

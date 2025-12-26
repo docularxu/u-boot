@@ -995,22 +995,6 @@ struct clk_retry_item {
 
 static LIST_HEAD(retry_list);
 
-static bool k1_clk_parents_valid(struct ccu_common *common)
-{
-	int i, ret;
-
-	for (i = 0; i < common->num_parents; i++) {
-		struct udevice *parent = NULL;
-
-		ret = uclass_get_device_by_name(UCLASS_CLK, common->parents[i],
-						&parent);
-		if (ret)
-			return false;
-	}
-
-	return true;
-}
-
 static int k1_clk_retry_add(struct ccu_common *common)
 {
 	struct clk_retry_item *item;
@@ -1034,9 +1018,6 @@ static int k1_clk_retry_register(void)
 	while (!list_empty(&retry_list) && retries) {
 		list_for_each_entry_safe(item, tmp, &retry_list, link) {
 			struct ccu_common *common = item->common;
-
-			if (!k1_clk_parents_valid(common))
-				continue;
 
 			ret = common->init(common);
 			if (ret)
@@ -1069,11 +1050,6 @@ static int k1_clk_register(struct udevice *dev, struct regmap *regmap,
 		common->lock_regmap = lock_regmap;
 
 		clk->id = i + data->offset;
-
-		if (!k1_clk_parents_valid(common)) {
-			k1_clk_retry_add(common);
-			continue;
-		}
 
 		ret = common->init(common);
 		if (ret)

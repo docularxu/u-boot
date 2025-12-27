@@ -31,6 +31,22 @@ static void reset_early_init(void)
 		panic("Fail to detect reset controller.\n");
 }
 
+static void i2c_scan_bus(struct udevice *bus)
+{
+	struct udevice *dev;
+	uint chip;
+	int ret;
+
+	printf("Probe i2c devices on bus %s\n", bus->name);
+	for (chip = 0x40; chip < 0x51; chip++) {
+		ret = dm_i2c_probe(bus, chip, 0, &dev);
+		if (ret == 0) {
+			printf("Found i2c (0x%x) on bus %s\n",
+				chip, bus->name);
+		}
+	}
+}
+
 static void i2c_early_init(void)
 {
 	struct udevice *bus;
@@ -41,6 +57,7 @@ static void i2c_early_init(void)
 	udelay(100);
 	uclass_first_device(UCLASS_I2C, &bus);
 	while (bus) {
+		i2c_scan_bus(bus);
 		uclass_next_device(&bus);
 		if (!bus)
 			break;

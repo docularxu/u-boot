@@ -79,24 +79,25 @@
 
 &soc {
 	bootph-all;
-	system-controller@d4015000 {
+
+	reset-controller@d4050000 {
 		status = "okay";
-		bootph-all;
 		bootph-pre-ram;
 	};
 	system-controller@d4050000 {
 		status = "okay";
-		bootph-all;
 		bootph-pre-ram;
 	};
 	clock-controller@d4090000 {
 		status = "okay";
-		bootph-all;
 		bootph-pre-ram;
 	};
 	system-controller@d4282800 {
 		status = "okay";
-		bootph-all;
+		bootph-pre-ram;
+	};
+	system-controller@d4015000 {
+		status = "okay";
 		bootph-pre-ram;
 	};
 
@@ -121,11 +122,6 @@
 			status = "okay";
 			bootph-pre-ram;
 		};
-	};
-
-	reset-controller@d4050000 {
-		status = "okay";
-		bootph-pre-ram;
 	};
 };
 

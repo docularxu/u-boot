@@ -104,13 +104,13 @@ static void clk_early_init(void)
 		panic("Fail to detect clock-controller@d4090000\n");
 	ret = uclass_get_device_by_name(UCLASS_CLK, "system-controller@d4050000", &dev);
 	if (ret)
-		panic("Fail to detect system-controller@d4015000\n");
-	ret = uclass_get_device_by_name(UCLASS_CLK, "system-controller@d4015000", &dev);
-	if (ret)
-		panic("Fail to detect system-controller@d4015000\n");
+		panic("Fail to detect system-controller@d4005000\n");
 	ret = uclass_get_device_by_name(UCLASS_CLK, "system-controller@d4282800", &dev);
 	if (ret)
 		panic("Fail to detect system-controller@d4282800\n");
+	ret = uclass_get_device_by_name(UCLASS_CLK, "system-controller@d4015000", &dev);
+	if (ret)
+		panic("Fail to detect system-controller@d4015000\n");
 
 	if (device_active(dev))
 		printf("clk: device is active\n");
@@ -194,7 +194,7 @@ void board_init_f(ulong dummy)
 
 	ret = spl_early_init();
 	if (ret)
-		panic("spl_early_init() failed:%d\n", ret);
+		printf("spl_early_init() failed:%d\n", ret);
 
 	riscv_cpu_setup();
 

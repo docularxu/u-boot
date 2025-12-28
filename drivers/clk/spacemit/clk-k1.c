@@ -760,6 +760,37 @@ static const struct spacemit_ccu_data k1_ccu_pll_data = {
 	.offset		= K1_PLL_ID_TRANS(0),
 };
 
+#if IS_ENABLED(CONFIG_SPL_BUILD)
+static struct clk *k1_ccu_mpmu_clks[] = {
+	&pll1_d8_307p2.common.clk,
+	&pll1_d32_76p8.common.clk,
+	&pll1_d40_61p44.common.clk,
+	&pll1_d16_153p6.common.clk,
+	&pll1_d24_102p4.common.clk,
+	&pll1_d48_51p2.common.clk,
+	&pll1_d48_51p2_ap.common.clk,
+	&pll1_m3d128_57p6.common.clk,
+	&pll1_d96_25p6.common.clk,
+	&pll1_d192_12p8.common.clk,
+	&pll1_d192_12p8_wdt.common.clk,
+	&pll1_d384_6p4.common.clk,
+	&pll1_d768_3p2.common.clk,
+	&pll1_d1536_1p6.common.clk,
+	&pll1_d3072_0p8.common.clk,
+	&pll1_d6_409p6.common.clk,
+	&pll1_d12_204p8.common.clk,
+	&pll1_d5_491p52.common.clk,
+	&pll1_d10_245p76.common.clk,
+	&pll1_d4_614p4.common.clk,
+	&pll1_d52_47p26.common.clk,
+	&pll1_d78_31p5.common.clk,
+	&pll1_d3_819p2.common.clk,
+	&pll1_d2_1228p8.common.clk,
+	&slow_uart.common.clk,
+	&slow_uart1_14p74.common.clk,
+	&slow_uart2_48.common.clk,
+};
+#else
 static struct clk *k1_ccu_mpmu_clks[] = {
 	&pll1_d8_307p2.common.clk,
 	&pll1_d32_76p8.common.clk,
@@ -789,16 +820,17 @@ static struct clk *k1_ccu_mpmu_clks[] = {
 	&slow_uart1_14p74.common.clk,
 	&slow_uart2_48.common.clk,
 	&wdt_clk.common.clk,
-	&ripc_clk.common.clk,
-	&i2s_sysclk.common.clk,
-	&i2s_bclk.common.clk,
 	&apb_clk.common.clk,
-	&wdt_bus_clk.common.clk,
+	&ripc_clk.common.clk,
 	&i2s_153p6.common.clk,
 	&i2s_153p6_base.common.clk,
 	&i2s_sysclk_src.common.clk,
+	&i2s_sysclk.common.clk,
 	&i2s_bclk_factor.common.clk,
+	&i2s_bclk.common.clk,
+	&wdt_bus_clk.common.clk,
 };
+#endif
 
 static const struct spacemit_ccu_data k1_ccu_mpmu_data = {
 	.clks		= k1_ccu_mpmu_clks,
@@ -925,6 +957,14 @@ static const struct spacemit_ccu_data k1_ccu_apbc_data = {
 	.offset		= K1_APBC_ID_TRANS(0),
 };
 
+#if IS_ENABLED(CONFIG_SPL_BUILD)
+static struct clk *k1_ccu_apmu_clks[] = {
+	&emmc_clk.common.clk,
+	&emmc_x_clk.common.clk,
+	&pmua_aclk.common.clk,
+	&emmc_bus_clk.common.clk,
+};
+#else
 static struct clk *k1_ccu_apmu_clks[] = {
 	&cci550_clk.common.clk,
 	&cpu_c0_hi_clk.common.clk,
@@ -989,6 +1029,7 @@ static struct clk *k1_ccu_apmu_clks[] = {
 	&v2d_clk.common.clk,
 	&emmc_bus_clk.common.clk,
 };
+#endif
 
 static const struct spacemit_ccu_data k1_ccu_apmu_data = {
 	.clks		= k1_ccu_apmu_clks,

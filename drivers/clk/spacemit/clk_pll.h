@@ -56,14 +56,14 @@ struct ccu_pll {
 		.mask_lock	= (_mask_lock),					\
 	}
 
-#define CCU_PLL_DEFINE(_name, _parent, _table, _reg_swcr1, _reg_swcr3,		\
+#define CCU_PLL_DEFINE(_id, _name, _parent, _table, _reg_swcr1, _reg_swcr3,	\
 			_reg_lock, _mask_lock, _flags)				\
 static struct ccu_pll _name = {							\
 	.config	= CCU_PLL_CONFIG(_table, _reg_lock, _mask_lock),		\
 	.common = {								\
 		.reg_swcr1	= _reg_swcr1,					\
 		.reg_swcr3	= _reg_swcr3,					\
-		CCU_COMMON(_name, _parent, spacemit_pll_init, _flags)		\
+		CCU_COMMON(_id, _name, _parent, spacemit_pll_init, _flags)	\
 	}									\
 }
 

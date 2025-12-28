@@ -22,12 +22,12 @@ struct ccu_ddn {
 	unsigned int pre_div;
 };
 
-#define CCU_DDN_DEFINE(_name, _parent, _reg_ctrl, _num_shift, _num_width,	\
+#define CCU_DDN_DEFINE(_id, _name, _parent, _reg_ctrl, _num_shift, _num_width,	\
 		       _den_shift, _den_width, _pre_div, _flags)		\
 static struct ccu_ddn _name = {							\
 	.common = {								\
 		.reg_ctrl	= _reg_ctrl,					\
-		CCU_COMMON(_name, _parent, spacemit_ddn_init, _flags)		\
+		CCU_COMMON(_id, _name, _parent, spacemit_ddn_init, _flags)	\
 	},									\
 	.num_mask	= GENMASK(_num_shift + _num_width - 1, _num_shift),	\
 	.num_shift	= _num_shift,						\

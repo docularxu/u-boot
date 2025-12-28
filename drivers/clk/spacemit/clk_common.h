@@ -41,19 +41,19 @@ struct ccu_common {
 	struct clk clk;
 };
 
-#define CCU_COMMON(_name, _parent, _init, _flags)			\
+#define CCU_COMMON(_id, _name, _parent, _init, _flags)			\
 	.name		= #_name,					\
 	.parents	= (const char *[]) { _parent },			\
 	.num_parents	= 1,						\
 	.init		= _init,					\
-	.clk		= { .flags = _flags, }				\
+	.clk		= { .flags = _flags, .id = _id, }		\
 
-#define CCU_COMMON_PARENTS(_name, _parents, _init, _flags)		\
+#define CCU_COMMON_PARENTS(_id, _name, _parents, _init, _flags)		\
 	.name		= #_name,					\
 	.parents	= _parents,					\
 	.num_parents	= ARRAY_SIZE(_parents),				\
 	.init		= _init,					\
-	.clk		= { .flags = _flags, }
+	.clk		= { .flags = _flags, .id = _id, }
 
 static inline struct ccu_common *clk_to_ccu_common(struct clk *clk)
 {

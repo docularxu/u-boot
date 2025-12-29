@@ -74,8 +74,6 @@ static const struct clk_ops k1_##name##_clk_ops = {	\
 		.set_rate = ccf_clk_set_rate,		\
 		.get_rate = ccf_clk_get_rate,		\
 		.set_parent = ccf_clk_set_parent,	\
-		.enable = ccf_clk_enable,		\
-		.disable = ccf_clk_disable,		\
 		.of_xlate = k1_##name##_clk_of_xlate,	}
 
 #endif /* _CLK_COMMON_H_ */

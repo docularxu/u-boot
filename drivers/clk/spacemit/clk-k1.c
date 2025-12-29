@@ -207,42 +207,72 @@ static const char *uart_clk_parents[] = {
 	"slow_uart1_14p74",
 	"slow_uart2_48",
 };
-CCU_MUX_GATE_DEFINE(CLK_UART0, uart0_clk, uart_clk_parents, APBC_UART1_CLK_RST, 4, 3, BIT(1), 0);
-CCU_MUX_GATE_DEFINE(CLK_UART2, uart2_clk, uart_clk_parents, APBC_UART2_CLK_RST, 4, 3, BIT(1), 0);
-CCU_MUX_GATE_DEFINE(CLK_UART3, uart3_clk, uart_clk_parents, APBC_UART3_CLK_RST, 4, 3, BIT(1), 0);
-CCU_MUX_GATE_DEFINE(CLK_UART4, uart4_clk, uart_clk_parents, APBC_UART4_CLK_RST, 4, 3, BIT(1), 0);
-CCU_MUX_GATE_DEFINE(CLK_UART5, uart5_clk, uart_clk_parents, APBC_UART5_CLK_RST, 4, 3, BIT(1), 0);
-CCU_MUX_GATE_DEFINE(CLK_UART6, uart6_clk, uart_clk_parents, APBC_UART6_CLK_RST, 4, 3, BIT(1), 0);
-CCU_MUX_GATE_DEFINE(CLK_UART7, uart7_clk, uart_clk_parents, APBC_UART7_CLK_RST, 4, 3, BIT(1), 0);
-CCU_MUX_GATE_DEFINE(CLK_UART8, uart8_clk, uart_clk_parents, APBC_UART8_CLK_RST, 4, 3, BIT(1), 0);
-CCU_MUX_GATE_DEFINE(CLK_UART9, uart9_clk, uart_clk_parents, APBC_UART9_CLK_RST, 4, 3, BIT(1), 0);
+CCU_MUX_GATE_DEFINE(CLK_UART0, uart0_clk, uart_clk_parents, APBC_UART1_CLK_RST,
+		    4, 3, BIT(1) | BIT(0), 0);
+CCU_MUX_GATE_DEFINE(CLK_UART2, uart2_clk, uart_clk_parents, APBC_UART2_CLK_RST,
+		    4, 3, BIT(1) | BIT(0), 0);
+CCU_MUX_GATE_DEFINE(CLK_UART3, uart3_clk, uart_clk_parents, APBC_UART3_CLK_RST,
+		    4, 3, BIT(1) | BIT(0), 0);
+CCU_MUX_GATE_DEFINE(CLK_UART4, uart4_clk, uart_clk_parents, APBC_UART4_CLK_RST,
+		    4, 3, BIT(1) | BIT(0), 0);
+CCU_MUX_GATE_DEFINE(CLK_UART5, uart5_clk, uart_clk_parents, APBC_UART5_CLK_RST,
+		    4, 3, BIT(1) | BIT(0), 0);
+CCU_MUX_GATE_DEFINE(CLK_UART6, uart6_clk, uart_clk_parents, APBC_UART6_CLK_RST,
+		    4, 3, BIT(1) | BIT(0), 0);
+CCU_MUX_GATE_DEFINE(CLK_UART7, uart7_clk, uart_clk_parents, APBC_UART7_CLK_RST,
+		    4, 3, BIT(1) | BIT(0), 0);
+CCU_MUX_GATE_DEFINE(CLK_UART8, uart8_clk, uart_clk_parents, APBC_UART8_CLK_RST,
+		    4, 3, BIT(1) | BIT(0), 0);
+CCU_MUX_GATE_DEFINE(CLK_UART9, uart9_clk, uart_clk_parents, APBC_UART9_CLK_RST,
+		    4, 3, BIT(1) | BIT(0), 0);
 
-CCU_GATE_DEFINE(CLK_GPIO, gpio_clk, "clock-24m", APBC_GPIO_CLK_RST, BIT(1), 0);
+CCU_GATE_DEFINE(CLK_GPIO, gpio_clk, "clock-24m", APBC_GPIO_CLK_RST,
+		BIT(1) | BIT(0), 0);
 
 static const char *pwm_parents[] = {
 	"pll1_d192_12p8",
 	"clock-32k",
 };
-CCU_MUX_GATE_DEFINE(CLK_PWM0, pwm0_clk, pwm_parents, APBC_PWM0_CLK_RST, 4, 3, BIT(1), 0);
-CCU_MUX_GATE_DEFINE(CLK_PWM1, pwm1_clk, pwm_parents, APBC_PWM1_CLK_RST, 4, 3, BIT(1), 0);
-CCU_MUX_GATE_DEFINE(CLK_PWM2, pwm2_clk, pwm_parents, APBC_PWM2_CLK_RST, 4, 3, BIT(1), 0);
-CCU_MUX_GATE_DEFINE(CLK_PWM3, pwm3_clk, pwm_parents, APBC_PWM3_CLK_RST, 4, 3, BIT(1), 0);
-CCU_MUX_GATE_DEFINE(CLK_PWM4, pwm4_clk, pwm_parents, APBC_PWM4_CLK_RST, 4, 3, BIT(1), 0);
-CCU_MUX_GATE_DEFINE(CLK_PWM5, pwm5_clk, pwm_parents, APBC_PWM5_CLK_RST, 4, 3, BIT(1), 0);
-CCU_MUX_GATE_DEFINE(CLK_PWM6, pwm6_clk, pwm_parents, APBC_PWM6_CLK_RST, 4, 3, BIT(1), 0);
-CCU_MUX_GATE_DEFINE(CLK_PWM7, pwm7_clk, pwm_parents, APBC_PWM7_CLK_RST, 4, 3, BIT(1), 0);
-CCU_MUX_GATE_DEFINE(CLK_PWM8, pwm8_clk, pwm_parents, APBC_PWM8_CLK_RST, 4, 3, BIT(1), 0);
-CCU_MUX_GATE_DEFINE(CLK_PWM9, pwm9_clk, pwm_parents, APBC_PWM9_CLK_RST, 4, 3, BIT(1), 0);
-CCU_MUX_GATE_DEFINE(CLK_PWM10, pwm10_clk, pwm_parents, APBC_PWM10_CLK_RST, 4, 3, BIT(1), 0);
-CCU_MUX_GATE_DEFINE(CLK_PWM11, pwm11_clk, pwm_parents, APBC_PWM11_CLK_RST, 4, 3, BIT(1), 0);
-CCU_MUX_GATE_DEFINE(CLK_PWM12, pwm12_clk, pwm_parents, APBC_PWM12_CLK_RST, 4, 3, BIT(1), 0);
-CCU_MUX_GATE_DEFINE(CLK_PWM13, pwm13_clk, pwm_parents, APBC_PWM13_CLK_RST, 4, 3, BIT(1), 0);
-CCU_MUX_GATE_DEFINE(CLK_PWM14, pwm14_clk, pwm_parents, APBC_PWM14_CLK_RST, 4, 3, BIT(1), 0);
-CCU_MUX_GATE_DEFINE(CLK_PWM15, pwm15_clk, pwm_parents, APBC_PWM15_CLK_RST, 4, 3, BIT(1), 0);
-CCU_MUX_GATE_DEFINE(CLK_PWM16, pwm16_clk, pwm_parents, APBC_PWM16_CLK_RST, 4, 3, BIT(1), 0);
-CCU_MUX_GATE_DEFINE(CLK_PWM17, pwm17_clk, pwm_parents, APBC_PWM17_CLK_RST, 4, 3, BIT(1), 0);
-CCU_MUX_GATE_DEFINE(CLK_PWM18, pwm18_clk, pwm_parents, APBC_PWM18_CLK_RST, 4, 3, BIT(1), 0);
-CCU_MUX_GATE_DEFINE(CLK_PWM19, pwm19_clk, pwm_parents, APBC_PWM19_CLK_RST, 4, 3, BIT(1), 0);
+CCU_MUX_GATE_DEFINE(CLK_PWM0, pwm0_clk, pwm_parents, APBC_PWM0_CLK_RST,
+		    4, 3, BIT(1) | BIT(0), 0);
+CCU_MUX_GATE_DEFINE(CLK_PWM1, pwm1_clk, pwm_parents, APBC_PWM1_CLK_RST,
+		    4, 3, BIT(1) | BIT(0), 0);
+CCU_MUX_GATE_DEFINE(CLK_PWM2, pwm2_clk, pwm_parents, APBC_PWM2_CLK_RST,
+		    4, 3, BIT(1) | BIT(0), 0);
+CCU_MUX_GATE_DEFINE(CLK_PWM3, pwm3_clk, pwm_parents, APBC_PWM3_CLK_RST,
+		    4, 3, BIT(1) | BIT(0), 0);
+CCU_MUX_GATE_DEFINE(CLK_PWM4, pwm4_clk, pwm_parents, APBC_PWM4_CLK_RST,
+		    4, 3, BIT(1) | BIT(0), 0);
+CCU_MUX_GATE_DEFINE(CLK_PWM5, pwm5_clk, pwm_parents, APBC_PWM5_CLK_RST,
+		    4, 3, BIT(1) | BIT(0), 0);
+CCU_MUX_GATE_DEFINE(CLK_PWM6, pwm6_clk, pwm_parents, APBC_PWM6_CLK_RST,
+		    4, 3, BIT(1) | BIT(0), 0);
+CCU_MUX_GATE_DEFINE(CLK_PWM7, pwm7_clk, pwm_parents, APBC_PWM7_CLK_RST,
+		    4, 3, BIT(1) | BIT(0), 0);
+CCU_MUX_GATE_DEFINE(CLK_PWM8, pwm8_clk, pwm_parents, APBC_PWM8_CLK_RST,
+		    4, 3, BIT(1) | BIT(0), 0);
+CCU_MUX_GATE_DEFINE(CLK_PWM9, pwm9_clk, pwm_parents, APBC_PWM9_CLK_RST,
+		    4, 3, BIT(1) | BIT(0), 0);
+CCU_MUX_GATE_DEFINE(CLK_PWM10, pwm10_clk, pwm_parents, APBC_PWM10_CLK_RST,
+		    4, 3, BIT(1) | BIT(0), 0);
+CCU_MUX_GATE_DEFINE(CLK_PWM11, pwm11_clk, pwm_parents, APBC_PWM11_CLK_RST,
+		    4, 3, BIT(1) | BIT(0), 0);
+CCU_MUX_GATE_DEFINE(CLK_PWM12, pwm12_clk, pwm_parents, APBC_PWM12_CLK_RST,
+		    4, 3, BIT(1) | BIT(0), 0);
+CCU_MUX_GATE_DEFINE(CLK_PWM13, pwm13_clk, pwm_parents, APBC_PWM13_CLK_RST,
+		    4, 3, BIT(1) | BIT(0), 0);
+CCU_MUX_GATE_DEFINE(CLK_PWM14, pwm14_clk, pwm_parents, APBC_PWM14_CLK_RST,
+		    4, 3, BIT(1) | BIT(0), 0);
+CCU_MUX_GATE_DEFINE(CLK_PWM15, pwm15_clk, pwm_parents, APBC_PWM15_CLK_RST,
+		    4, 3, BIT(1) | BIT(0), 0);
+CCU_MUX_GATE_DEFINE(CLK_PWM16, pwm16_clk, pwm_parents, APBC_PWM16_CLK_RST,
+		    4, 3, BIT(1) | BIT(0), 0);
+CCU_MUX_GATE_DEFINE(CLK_PWM17, pwm17_clk, pwm_parents, APBC_PWM17_CLK_RST,
+		    4, 3, BIT(1) | BIT(0), 0);
+CCU_MUX_GATE_DEFINE(CLK_PWM18, pwm18_clk, pwm_parents, APBC_PWM18_CLK_RST,
+		    4, 3, BIT(1) | BIT(0), 0);
+CCU_MUX_GATE_DEFINE(CLK_PWM19, pwm19_clk, pwm_parents, APBC_PWM19_CLK_RST,
+		    4, 3, BIT(1) | BIT(0), 0);
 
 static const char *ssp_parents[] = {
 	"pll1_d384_6p4",
@@ -257,7 +287,7 @@ CCU_MUX_GATE_DEFINE(CLK_SSP3, ssp3_clk, ssp_parents, APBC_SSP3_CLK_RST, 4, 3,
 		    BIT(1), 0);
 
 CCU_GATE_DEFINE(CLK_RTC, rtc_clk, "clock-32k", APBC_RTC_CLK_RST,
-		BIT(7) | BIT(1), 0);
+		BIT(7) | BIT(1) | BIT(0), 0);
 
 static const char *twsi_parents[] = {
 	"pll1_d78_31p5",
@@ -265,19 +295,19 @@ static const char *twsi_parents[] = {
 	"pll1_d40_61p44",
 };
 CCU_MUX_GATE_DEFINE(CLK_TWSI0, twsi0_clk, twsi_parents, APBC_TWSI0_CLK_RST,
-		    4, 3, BIT(1), 0);
+		    4, 3, BIT(1) | BIT(0), 0);
 CCU_MUX_GATE_DEFINE(CLK_TWSI1, twsi1_clk, twsi_parents, APBC_TWSI1_CLK_RST,
-		    4, 3, BIT(1), 0);
+		    4, 3, BIT(1) | BIT(0), 0);
 CCU_MUX_GATE_DEFINE(CLK_TWSI2, twsi2_clk, twsi_parents, APBC_TWSI2_CLK_RST,
-		    4, 3, BIT(1), 0);
+		    4, 3, BIT(1) | BIT(0), 0);
 CCU_MUX_GATE_DEFINE(CLK_TWSI4, twsi4_clk, twsi_parents, APBC_TWSI4_CLK_RST,
-		    4, 3, BIT(1), 0);
+		    4, 3, BIT(1) | BIT(0), 0);
 CCU_MUX_GATE_DEFINE(CLK_TWSI5, twsi5_clk, twsi_parents, APBC_TWSI5_CLK_RST,
-		    4, 3, BIT(1), 0);
+		    4, 3, BIT(1) | BIT(0), 0);
 CCU_MUX_GATE_DEFINE(CLK_TWSI6, twsi6_clk, twsi_parents, APBC_TWSI6_CLK_RST,
-		    4, 3, BIT(1), 0);
+		    4, 3, BIT(1) | BIT(0), 0);
 CCU_MUX_GATE_DEFINE(CLK_TWSI7, twsi7_clk, twsi_parents, APBC_TWSI7_CLK_RST,
-		    4, 3, BIT(1), 0);
+		    4, 3, BIT(1) | BIT(0), 0);
 /*
  * APBC_TWSI8_CLK_RST has a quirk that reading always results in zero.
  * Combine functional and bus bits together as a gate to avoid sharing the
@@ -294,14 +324,15 @@ static const char *timer_parents[] = {
 	"clock-1m",
 };
 CCU_MUX_GATE_DEFINE(CLK_TIMERS1, timers1_clk, timer_parents,
-		    APBC_TIMERS1_CLK_RST, 4, 3, BIT(1), 0);
+		    APBC_TIMERS1_CLK_RST, 4, 3, BIT(1) | BIT(0), 0);
 CCU_MUX_GATE_DEFINE(CLK_TIMERS2, timers2_clk, timer_parents,
-		    APBC_TIMERS2_CLK_RST, 4, 3, BIT(1), 0);
+		    APBC_TIMERS2_CLK_RST, 4, 3, BIT(1) | BIT(0), 0);
 
-CCU_GATE_DEFINE(CLK_AIB, aib_clk, "clock-24m", APBC_AIB_CLK_RST, BIT(1), 0);
+CCU_GATE_DEFINE(CLK_AIB, aib_clk, "clock-24m", APBC_AIB_CLK_RST,
+		BIT(1) | BIT(0), 0);
 
 CCU_GATE_DEFINE(CLK_ONEWIRE, onewire_clk, "clock-24m", APBC_ONEWIRE_CLK_RST,
-		BIT(1), 0);
+		BIT(1) | BIT(0), 0);
 
 /*
  * When i2s_bclk is selected as the parent clock of sspa,
@@ -338,11 +369,13 @@ static const char *sspa1_parents[] = {
 CCU_MUX_GATE_DEFINE(CLK_SSPA1, sspa1_clk, sspa1_parents, APBC_SSPA1_CLK_RST,
 		    4, 3, BIT(1), 0);
 
-CCU_GATE_DEFINE(CLK_DRO, dro_clk, "apb_clk", APBC_DRO_CLK_RST, BIT(1), 0);
-CCU_GATE_DEFINE(CLK_IR, ir_clk, "apb_clk", APBC_IR_CLK_RST, BIT(1), 0);
-CCU_GATE_DEFINE(CLK_TSEN, tsen_clk, "apb_clk", APBC_TSEN_CLK_RST, BIT(1), 0);
+CCU_GATE_DEFINE(CLK_DRO, dro_clk, "apb_clk", APBC_DRO_CLK_RST,
+		BIT(1) | BIT(0), 0);
+CCU_GATE_DEFINE(CLK_IR, ir_clk, "apb_clk", APBC_IR_CLK_RST, BIT(1) | BIT(0), 0);
+CCU_GATE_DEFINE(CLK_TSEN, tsen_clk, "apb_clk", APBC_TSEN_CLK_RST,
+		BIT(1) | BIT(0), 0);
 CCU_GATE_DEFINE(CLK_IPC_AP2AUD, ipc_ap2aud_clk, "apb_clk",
-		APBC_IPC_AP2AUD_CLK_RST, BIT(1), 0);
+		APBC_IPC_AP2AUD_CLK_RST, BIT(1) | BIT(0), 0);
 
 static const char *can_parents[] = {
 	"pll3_20",

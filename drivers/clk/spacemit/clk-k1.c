@@ -1293,7 +1293,46 @@ static int k1_clk_probe(struct udevice *dev)
 
 	ret = k1_clk_register(dev, base_regmap, lock_regmap, data);
 	if (ret)
+		return -EPROBE_DEFER;
+
+	return k1_clk_retry_register();
+}
+
+static int k1_apbc_clk_probe(struct udevice *dev)
+{
+	struct regmap *base_regmap, *lock_regmap = NULL;
+	const struct spacemit_ccu_data *data;
+	int ret;
+	struct clk *clk;
+
+	ret = regmap_init_mem(dev_ofnode(dev), &base_regmap);
+	if (ret)
 		return ret;
+
+	clk = clk_register_fixed_rate(NULL, "clock-1m", 1000000);
+	clk->id = 1;
+	clk = clk_register_fixed_rate(NULL, "clock-24m", 24000000);
+	clk->id = 2;
+	clk = clk_register_fixed_rate(NULL, "clock-3m", 3000000);
+	clk->id = 3;
+	clk = clk_register_fixed_rate(NULL, "clock-32k", 32000);
+	clk->id = 4;
+
+	/* probe PLL controller */
+	ret = clk_get_by_index(dev, 5, clk);
+	if (ret)
+		return -EPROBE_DEFER;
+
+	/* probe MPMU controller */
+	ret = clk_get_by_index(dev, 4, clk);
+	if (ret)
+		return -EPROBE_DEFER;
+
+	data = (struct spacemit_ccu_data *)dev_get_driver_data(dev);
+
+	ret = k1_clk_register(dev, base_regmap, lock_regmap, data);
+	if (ret)
+		return -EPROBE_DEFER;
 
 	return k1_clk_retry_register();
 }
@@ -1416,7 +1455,7 @@ U_BOOT_DRIVER(k1_apbc_clk) = {
 	.id		= UCLASS_CLK,
 	.of_match	= k1_apbc_clk_match,
 	.bind		= k1_clk_bind,
-	.probe		= k1_clk_probe,
+	.probe		= k1_apbc_clk_probe,
 	.ops		= &k1_apbc_clk_ops,
 	.flags		= DM_FLAG_PRE_RELOC,
 };

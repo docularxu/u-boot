@@ -97,6 +97,11 @@
 		bootph-pre-ram;
 	};
 	system-controller@d4015000 {
+		clocks = <&osc_32k>, <&vctcxo_1m>, <&vctcxo_3m>,
+			 <&vctcxo_24m>, <&syscon_mpmu CLK_PLL1_31P5>,
+			 <&pll CLK_PLL1_D8>;
+		clock-names = "osc", "vctcxo_1m", "vctcxo_3m",
+			      "vctcxo_24m", "pll1_d78_31p5", "pll1_d8";
 		status = "okay";
 		bootph-pre-ram;
 	};
@@ -121,6 +126,26 @@
 			//bus = <8>;
 			status = "okay";
 			bootph-pre-ram;
+
+			regulators {
+				status = "okay";
+				bootph-pre-ram;
+
+				DCDC_REG1 {
+					status = "okay";
+					bootph-pre-ram;
+				};
+
+				DCDC_REG3 {
+					status = "okay";
+					bootph-pre-ram;
+				};
+
+				ALDO_REG1 {
+					status = "okay";
+					bootph-pre-ram;
+				};
+			};
 		};
 	};
 };

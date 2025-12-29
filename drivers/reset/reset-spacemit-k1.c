@@ -10,7 +10,7 @@
 #include <dm/device_compat.h>
 #include <dm/device-internal.h>
 #include <dm/lists.h>
-#include <dt-bindings/reset/spacemit-k1-reset.h>
+#include <dt-bindings/clock/spacemit,k1-syscon.h>
 #include <linux/bitops.h>
 #include <soc/spacemit/k1-syscon.h>
 #include <reset-uclass.h>

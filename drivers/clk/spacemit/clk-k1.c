@@ -1207,6 +1207,71 @@ static struct clk *k1_ccu_apmu_clks[] = {
 };
 #endif
 
+static int clk_k1_enable(struct clk *clk)
+{
+	const struct spacemit_ccu_data *data;
+	struct clk *c;
+	struct clk *pclk;
+	int ret, i;
+
+	data = (struct spacemit_ccu_data *)dev_get_driver_data(clk->dev);
+	for (i = 0; i < data->num; i++) {
+		if (clk->id == data->clks[i]->id) {
+			c = data->clks[i];
+			break;
+		}
+	}
+	if (i == data->num)
+		c = clk;
+
+	pclk = clk_get_parent(c);
+	if (!IS_ERR_OR_NULL(pclk)) {
+		ret = ccf_clk_enable(pclk);
+		if (ret) {
+			return ret;
+		}
+	}
+	ret = ccu_gate_enable(c);
+	return ret;
+}
+
+static int clk_k1_disable(struct clk *clk)
+{
+	const struct spacemit_ccu_data *data;
+	struct clk *c;
+	struct clk *pclk;
+	int ret, i;
+
+	data = (struct spacemit_ccu_data *)dev_get_driver_data(clk->dev);
+	for (i = 0; i < data->num; i++) {
+		if (clk->id == data->clks[i]->id) {
+			c = data->clks[i];
+			break;
+		}
+	}
+	if (i == data->num)
+		c = clk;
+
+	pclk = clk_get_parent(c);
+	if (!IS_ERR_OR_NULL(pclk)) {
+		ret = ccf_clk_disable(pclk);
+		if (ret)
+			return ret;
+	}
+	ret = ccu_gate_disable(c);
+	return ret;
+}
+
+#define K1_CLK_OPS(name)				\
+static const struct clk_ops k1_##name##_clk_ops = {	\
+		.set_rate = ccf_clk_set_rate,		\
+		.get_rate = ccf_clk_get_rate,		\
+		.enable = clk_k1_enable,		\
+		.disable = clk_k1_disable,		\
+		.set_parent = ccf_clk_set_parent,	\
+		.of_xlate = k1_##name##_clk_of_xlate,	\
+}
+
 static const struct spacemit_ccu_data k1_ccu_apmu_data = {
 	.clks		= k1_ccu_apmu_clks,
 	.num		= ARRAY_SIZE(k1_ccu_apmu_clks),
@@ -1289,16 +1354,11 @@ static int k1_clk_probe(struct udevice *dev)
 	struct regmap *base_regmap, *lock_regmap = NULL;
 	const struct spacemit_ccu_data *data;
 	int ret;
-	struct clk *clk;
 
-	clk = clk_register_fixed_rate(NULL, "clock-1m", 1000000);
-	clk->id = 1;
-	clk = clk_register_fixed_rate(NULL, "clock-24m", 24000000);
-	clk->id = 2;
-	clk = clk_register_fixed_rate(NULL, "clock-3m", 3000000);
-	clk->id = 3;
-	clk = clk_register_fixed_rate(NULL, "clock-32k", 32000);
-	clk->id = 4;
+	clk_register_fixed_rate(NULL, "clock-1m", 1000000);
+	clk_register_fixed_rate(NULL, "clock-24m", 24000000);
+	clk_register_fixed_rate(NULL, "clock-3m", 3000000);
+	clk_register_fixed_rate(NULL, "clock-32k", 32000);
 
 	ret = regmap_init_mem(dev_ofnode(dev), &base_regmap);
 	if (ret)
@@ -1336,30 +1396,48 @@ static int k1_apbc_clk_probe(struct udevice *dev)
 	struct regmap *base_regmap, *lock_regmap = NULL;
 	const struct spacemit_ccu_data *data;
 	int ret;
-	struct clk *clk;
+	struct clk clk;
 
 	ret = regmap_init_mem(dev_ofnode(dev), &base_regmap);
 	if (ret)
 		return ret;
 
-	clk = clk_register_fixed_rate(NULL, "clock-1m", 1000000);
-	clk->id = 1;
-	clk = clk_register_fixed_rate(NULL, "clock-24m", 24000000);
-	clk->id = 2;
-	clk = clk_register_fixed_rate(NULL, "clock-3m", 3000000);
-	clk->id = 3;
-	clk = clk_register_fixed_rate(NULL, "clock-32k", 32000);
-	clk->id = 4;
+	clk_register_fixed_rate(NULL, "clock-1m", 1000000);
+	clk_register_fixed_rate(NULL, "clock-24m", 24000000);
+	clk_register_fixed_rate(NULL, "clock-3m", 3000000);
+	clk_register_fixed_rate(NULL, "clock-32k", 32000);
 
 	/* probe PLL controller */
-	ret = clk_get_by_index(dev, 5, clk);
+	ret = clk_get_by_index(dev, 5, &clk);
 	if (ret)
 		return -EPROBE_DEFER;
 
 	/* probe MPMU controller */
-	ret = clk_get_by_index(dev, 4, clk);
+	ret = clk_get_by_index(dev, 4, &clk);
 	if (ret)
 		return -EPROBE_DEFER;
+
+	ret = regmap_init_mem(dev_ofnode(dev), &base_regmap);
+	if (ret)
+		return ret;
+
+	/*
+	 * The lock status of PLLs locate in MPMU region, while PLLs themselves
+	 * are in APBS region. Reference to MPMU syscon is required to check PLL
+	 * status.
+	 */
+	if (device_is_compatible(dev, "spacemit,k1-pll")) {
+		struct ofnode_phandle_args mpmu_args;
+
+		ret = dev_read_phandle_with_args(dev, "spacemit,mpmu", NULL, 0, 0,
+						 &mpmu_args);
+		if (ret)
+			return ret;
+
+		ret = regmap_init_mem(mpmu_args.node, &lock_regmap);
+		if (ret)
+			return ret;
+	}
 
 	data = (struct spacemit_ccu_data *)dev_get_driver_data(dev);
 
@@ -1368,15 +1446,6 @@ static int k1_apbc_clk_probe(struct udevice *dev)
 		return -EPROBE_DEFER;
 
 	return k1_clk_retry_register();
-}
-
-static int k1_clk_bind(struct udevice *dev)
-{
-	// printf("%s: binding %s\n", __func__, dev->name);
-	return 0;
-	/* The reset driver does not have a device node, so bind it here */
-	return device_bind_driver_to_node(dev, "k1_reset", dev->name,
-					  dev_ofnode(dev), NULL);
 }
 
 static int k1_pll_clk_of_xlate(struct clk *clk, struct ofnode_phandle_args *args)
@@ -1451,7 +1520,6 @@ U_BOOT_DRIVER(k1_pll_clk) = {
 	.name		= "k1_pll_clk",
 	.id		= UCLASS_CLK,
 	.of_match	= k1_pll_clk_match,
-	.bind		= k1_clk_bind,
 	.probe		= k1_clk_probe,
 	.ops		= &k1_pll_clk_ops,
 	.flags		= DM_FLAG_PRE_RELOC,
@@ -1469,7 +1537,6 @@ U_BOOT_DRIVER(k1_mpmu_clk) = {
 	.name		= "k1_mpmu_clk",
 	.id		= UCLASS_CLK,
 	.of_match	= k1_mpmu_clk_match,
-	.bind		= k1_clk_bind,
 	.probe		= k1_clk_probe,
 	.ops		= &k1_mpmu_clk_ops,
 	.flags		= DM_FLAG_PRE_RELOC,
@@ -1487,7 +1554,6 @@ U_BOOT_DRIVER(k1_apbc_clk) = {
 	.name		= "k1_apbc_clk",
 	.id		= UCLASS_CLK,
 	.of_match	= k1_apbc_clk_match,
-	.bind		= k1_clk_bind,
 	.probe		= k1_apbc_clk_probe,
 	.ops		= &k1_apbc_clk_ops,
 	.flags		= DM_FLAG_PRE_RELOC,
@@ -1505,7 +1571,6 @@ U_BOOT_DRIVER(k1_apmu_clk) = {
 	.name		= "k1_apmu_clk",
 	.id		= UCLASS_CLK,
 	.of_match	= k1_apmu_clk_match,
-	.bind		= k1_clk_bind,
 	.probe		= k1_clk_probe,
 	.ops		= &k1_apmu_clk_ops,
 	.flags		= DM_FLAG_PRE_RELOC,
@@ -1520,7 +1585,6 @@ U_BOOT_DRIVER(k1_rcpu_clk) = {
 	.name		= "k1_rcpu_clk",
 	.id		= UCLASS_CLK,
 	.of_match	= k1_rcpu_clk_match,
-	.bind		= k1_clk_bind,
 	.flags		= DM_FLAG_PRE_RELOC,
 };
 
@@ -1533,7 +1597,6 @@ U_BOOT_DRIVER(k1_rcpu2_clk) = {
 	.name		= "k1_rcpu2_clk",
 	.id		= UCLASS_CLK,
 	.of_match	= k1_rcpu2_clk_match,
-	.bind		= k1_clk_bind,
 	.flags		= DM_FLAG_PRE_RELOC,
 };
 
@@ -1546,6 +1609,5 @@ U_BOOT_DRIVER(k1_apbc2_clk) = {
 	.name		= "k1_apbc2_clk",
 	.id		= UCLASS_CLK,
 	.of_match	= k1_apbc2_clk_match,
-	.bind		= k1_clk_bind,
 	.flags		= DM_FLAG_PRE_RELOC,
 };

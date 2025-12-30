@@ -69,11 +69,4 @@ static inline struct ccu_common *clk_to_ccu_common(struct clk *clk)
 #define ccu_update(c, reg, mask, val) \
 	regmap_update_bits((c)->regmap, (c)->reg_##reg, mask, val)
 
-#define K1_CLK_OPS(name)				\
-static const struct clk_ops k1_##name##_clk_ops = {	\
-		.set_rate = ccf_clk_set_rate,		\
-		.get_rate = ccf_clk_get_rate,		\
-		.set_parent = ccf_clk_set_parent,	\
-		.of_xlate = k1_##name##_clk_of_xlate,	}
-
 #endif /* _CLK_COMMON_H_ */

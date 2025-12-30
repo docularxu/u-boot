@@ -199,6 +199,9 @@ static inline struct ccu_mix *clk_to_ccu_mix(struct clk *clk)
 	return container_of(common, struct ccu_mix, common);
 }
 
+int ccu_gate_enable(struct clk *clk);
+int ccu_gate_disable(struct clk *clk);
+
 int spacemit_gate_init(struct ccu_common *common);
 int spacemit_factor_init(struct ccu_common *common);
 int spacemit_mux_init(struct ccu_common *common);

@@ -30,7 +30,7 @@
 #define MIX_FC_TIMEOUT_US	10000
 #define MIX_FC_DELAY_US		5
 
-static int ccu_gate_disable(struct clk *clk)
+int ccu_gate_disable(struct clk *clk)
 {
 	struct ccu_mix *mix = clk_to_ccu_mix(clk);
 
@@ -39,7 +39,7 @@ static int ccu_gate_disable(struct clk *clk)
 	return 0;
 }
 
-static int ccu_gate_enable(struct clk *clk)
+int ccu_gate_enable(struct clk *clk)
 {
 	struct ccu_mix *mix = clk_to_ccu_mix(clk);
 	struct ccu_gate_config *gate = &mix->gate;

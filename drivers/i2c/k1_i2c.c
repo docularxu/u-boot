@@ -67,15 +67,11 @@ static void i2c_reset(void __iomem *base)
 	icr_mode = readl(base + ICR_OFFSET) & ICR_MODE_MASK;
 	/* disable unit */
 	val = readl(base + ICR_OFFSET);
-	printf("%s, %d, base:0x%x, val:0x%x\n",
-		__func__, __LINE__, base, val);
 	writel(val & ~ICR_IUE, base + ICR_OFFSET);
 	udelay(10);
 	/* reset the unit */
 	val = readl(base + ICR_OFFSET);
 	val |= ICR_UR;
-	printf("%s, %d, base:0x%x, val:0x%x\n",
-		__func__, __LINE__, base, val);
 	writel(val, base + ICR_OFFSET);
 	udelay(100);
 	/* disable unit */

@@ -9,7 +9,9 @@ obj-$(CONFIG_SPL_BUILD) += spl.o
 DDR_FW_SRC ?= $(DDR_FW_FILE)
 FW_TARGET = $(CURDIR)/ddr_fw.bin
 
-$(obj)/spl.o: $(FW_TARGET)
+DDR_FW_HEADER = $(srctree)/include/generated/ddr_fw_info.h
+
+$(obj)/spl.o: $(DDR_FW_HEADER)
 
 $(FW_TARGET):
 	@echo "Preparing DDR firmware..."
@@ -28,4 +30,19 @@ $(FW_TARGET):
 		echo "  Final: $@ ($$SIZE bytes)"; \
 	fi
 
-clean-files += $(FW_TARGET)
+$(DDR_FW_HEADER): $(FW_TARGET)
+	@mkdir -p $(dir $@)
+	@echo "/* DDR firmware info - $$(date) */" > $@
+	@if [ -f "$(FW_TARGET)" ]; then \
+		SIZE=$$(stat -c%s "$(FW_TARGET)" 2>/dev/null || echo 0); \
+	else \
+		SIZE=0; \
+	fi; \
+	echo "#define DDR_FW_FILE_SIZE	$$SIZE" >> $@
+	@if grep -q "CONFIG_SPL_DDR_FIRMWARE_OFFSET=0x" .config 2>/dev/null; then \
+		OFFSET=$$(grep "CONFIG_SPL_DDR_FIRMWARE_OFFSET=0x" .config | cut -d= -f2); \
+	fi; \
+	echo "#define DDR_FW_OFFSET	$$OFFSET" >> $@
+	@echo "/* Note: Update ADDR if binman layout changes */" >> $@
+
+clean-files += $(FW_TARGET) $(DDR_FW_HEADER)

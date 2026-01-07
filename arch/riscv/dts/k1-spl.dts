@@ -148,6 +148,17 @@
 			};
 		};
 	};
+
+	ddr-controller@c0000000 {
+		compatible = "spacemit,ddr";
+		reg = <0x00000000 0xC0000000 0x00000000 0x00400000>;
+		spacemit,data-rate = <0>;
+		spacemit,cs-num = <0>;
+		spacemit,ddr-type = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
+		spacemit,tx-odt = <0>;
+		status = "okay";
+		bootph-pre-ram;
+	};
 };
 
 &uart0 {

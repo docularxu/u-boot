@@ -34,3 +34,6 @@ obj-$(CONFIG_CADENCE_DDR_CTRL) += cadence/
 ifdef CONFIG_XPL_BUILD
 obj-$(CONFIG_SPL_THEAD_TH1520_DDR) += thead/
 endif
+
+obj-$(CONFIG_DRAM_SPACEMIT_K1) += spacemit/
+obj-$(CONFIG_SPL_DRAM_SPACEMIT_K1) += spacemit/

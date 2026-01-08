@@ -1,0 +1,15 @@
+config DRAM_SPACEMIT_K1
+	bool "DRAM driver support for Spacemit K1 SoC"
+	default y if SPACEMIT_K1
+	depends on RAM
+	help
+	  This enables support for the DRAM controller driver for
+	  Spacemit K1 SoC.
+
+config SPL_DRAM_SPACEMIT_K1
+	bool "DRAM driver support for Spacemit K1 SoC in SPL"
+	default y if SPACEMIT_K1 && SPL
+	depends on RAM
+	help
+	  This enables support for the DRAM controller driver in SPL
+	  for Spacemit K1 SoC.

@@ -77,7 +77,7 @@ static const struct spm8821_reg_info *get_buck_reg(struct udevice *pmic,
 {
 	if (idx < 0)
 		return NULL;
-	if (uvolt < 13750000)
+	if (uvolt < 1375000)
 		return &spm8821_bucks[(idx - 1) * 2 + 0];
 	return &spm8821_bucks[(idx - 1) * 2 + 1];
 }
@@ -111,12 +111,61 @@ static int buck_get_value(struct udevice *dev)
 	ret = pmic_reg_read(dev->parent, info->vsel_reg);
 	if (ret < 0)
 		return ret;
-	printf("%s: name:%s, driver_data:%d\n", __func__, dev->name, dev->driver_data);
 	val = ret & info->vsel_mask;
 	while (val > info->max_sel)
 		info++;
 
 	return info->min_uv + (val - info->min_sel) * info->step_uv;
+}
+
+static int buck_set_value(struct udevice *dev, int uvolt)
+{
+	struct spm8821_regulator_pdata *priv = dev_get_priv(dev);
+	const struct dm_pmic_ops *ops = device_get_ops(dev->parent);
+	const struct spm8821_reg_info *info;
+	uint val;
+	int ret;
+
+	if (!ops || !ops->write)
+		return -ENOSYS;
+
+	info = get_buck_reg(dev->parent, dev->driver_data, uvolt);
+	if (!info)
+		return -ENOENT;
+	val = (uvolt - info->min_uv);
+	val = val / info->step_uv;
+	val += info->min_sel;
+	ret = pmic_reg_write(dev->parent, info->vsel_reg, val);
+	if (ret < 0)
+		return ret;
+	return 0;
+}
+
+static int buck_set_enable(struct udevice *dev, bool enable)
+{
+	struct spm8821_regulator_pdata *priv = dev_get_priv(dev);
+	const struct dm_pmic_ops *ops = device_get_ops(dev->parent);
+	const struct spm8821_reg_info *info;
+	uint val;
+	int ret;
+
+	info = get_buck_reg(dev->parent, dev->driver_data, 0);
+	if (!info)
+		return -ENOENT;
+
+	val = (unsigned int)ret;
+	val &= 1;
+
+	if (enable == val)
+		return 0;
+
+	val = enable;
+
+	ret = pmic_clrsetbits(dev->parent, info->config_reg, 1, val);
+	if (ret < 0)
+		return ret;
+
+	return 0;
 }
 
 static int spm8821_buck_probe(struct udevice *dev)
@@ -134,12 +183,12 @@ static int spm8821_buck_probe(struct udevice *dev)
 
 static const struct dm_regulator_ops spm8821_buck_ops = {
 	.get_value  = buck_get_value,
-	/*
 	.set_value  = buck_set_value,
+	.set_enable = buck_set_enable,
+	/*
 	.set_suspend_value = buck_set_suspend_value,
 	.get_suspend_value = buck_get_suspend_value,
 	.get_enable = buck_get_enable,
-	.set_enable = buck_set_enable,
 	.set_suspend_enable = buck_set_suspend_enable,
 	.get_suspend_enable = buck_get_suspend_enable,
 	*/

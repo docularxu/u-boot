@@ -33,9 +33,9 @@
 #define SPM8821_REG_BUCK5_SVSEL		0x55
 #define SPM8821_REG_BUCK6_SVSEL		0x58
 
-#define SPM8821_BUCK_CTRL(x)		(0x46 + (x))
-#define SPM8821_BUCK_VSEL(x)		(0x47 + (x))
-#define SPM8821_BUCK_SVSEL(x)		(0x48 + (x))
+#define SPM8821_BUCK_CTRL(x)		(0x47 + ((x) - 1) * 3)
+#define SPM8821_BUCK_VSEL(x)		(0x48 + ((x) - 1) * 3)
+#define SPM8821_BUCK_SVSEL(x)		(0x49 + ((x) - 1) * 3)
 
 #define BUCK_VSEL_MASK			0xff
 #define BUCK_EN_MASK			0x1

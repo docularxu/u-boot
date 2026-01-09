@@ -379,12 +379,16 @@ void board_init_f(ulong dummy)
 
 	riscv_cpu_setup();
 
+	/*
 	reset_early_init();
 	clk_early_init();
+	*/
 	serial_early_init();
 
 	preloader_console_init();
 
+	ddr_early_init();
+	/*
 	i2c_early_init();
 	ret = read_product_name(i2c_buf, I2C_BUF_SIZE);
 	if (ret)
@@ -392,8 +396,8 @@ void board_init_f(ulong dummy)
 	else
 		printf("Get board name:%s\n", (char *)i2c_buf);
 	pmic_init();
+	*/
 
-	ddr_early_init();
 }
 
 u32 spl_boot_device(void)

@@ -41,6 +41,64 @@
 				offset = <0>;
 			};
 		};
+
+		u-boot-itb {
+			type = "section";
+			filename = "u-boot.itb";
+
+			fit {
+				type = "fit";
+				description = "FIT image for U-Boot proper";
+				#address-cells = <1>;
+
+				images {
+					u-boot {
+						description = "U-Boot";
+						type = "standalone";
+						os = "u-boot";
+						arch = "riscv";
+						compression = "none";
+						load = <CONFIG_TEXT_BASE>;
+
+						u-boot-nodtb {
+						};
+					};
+
+					opensbi {
+						description = "OpenSBI fw_dynamic Firmware";
+						type = "firmware";
+						os = "opensbi";
+						arch = "riscv";
+						compression = "none";
+						load = <CONFIG_SPL_OPENSBI_LOAD_ADDR>;
+						entry = <CONFIG_SPL_OPENSBI_LOAD_ADDR>;
+
+						opensbi_blob: opensbi {
+							filename = "fw_dynamic.bin";
+						};
+					};
+
+					fdt {
+						description = "Device Tree";
+						type = "flat_dt";
+						compression = "none";
+
+						u-boot-dtb {
+						};
+					};
+				};
+
+				configurations {
+					default = "conf-1";
+					conf-1 {
+						description = "Default Configuration";
+						firmware = "opensbi";
+						loadables = "u-boot";
+						fdt = "fdt";
+					};
+				};
+			};
+		};
 	};
 };
 

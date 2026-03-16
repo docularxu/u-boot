@@ -454,6 +454,7 @@ static int k1_i2c_set_bus_speed(struct udevice *bus, unsigned int speed)
 	void __iomem *base = priv->base;
 	u32 val;
 
+	log_info("%s, %d, bus->name:%s, base:0x%x\n", __func__, __LINE__, bus->name, base);
 	if (speed > I2C_SPEED_STANDARD_RATE)
 		val = ICR_FM;
 	else
@@ -469,6 +470,26 @@ static int k1_i2c_probe(struct udevice *bus)
 	struct reset_ctl reset;
 	int ret;
 
+	{
+		log_info("%s, %d\n", __func__, __LINE__);
+		void *pc = __builtin_return_address(0);                                                                                  
+		log_info("%s, %d, PC:0x%x, malloc_base:0x%llx\n", __func__, __LINE__, pc, gd->malloc_base); 
+
+		int mmu_state = -1;
+		unsigned long satp;
+		__asm__ volatile("csrr %0, satp" : "=r"(satp));
+
+		int enabled = ((satp >> 60) != 0);
+		if (mmu_state != enabled) {
+			log_info("MMU state CHANGE: %s -> %s at PC ",
+				mmu_state == -1 ? "INIT" : (mmu_state ? "ENABLED" : "DISABLED"),
+				enabled ? "ENABLED" : "DISABLED");
+			unsigned long vpc;
+			__asm__ volatile("auipc %0, 0" : "=r"(vpc));
+			log_info("0x%lx\n", vpc);
+			mmu_state = enabled;
+		}
+	}
 	priv->id = dev_seq(bus);
 	ret = reset_get_by_index(bus, 0, &reset);
 	if (ret) {
@@ -480,19 +501,24 @@ static int k1_i2c_probe(struct udevice *bus)
 	reset_deassert(&reset);
 	udelay(10);
 
+	log_info("%s, %d, bus->name:%s\n", __func__, __LINE__, bus->name);
 	ret = clk_get_by_index(bus, 0, &priv->clk);
 	if (ret)
 		return ret;
 
+	/*
+	log_info("%s, %d, priv->id:%d, bus->name:%s\n", __func__, __LINE__, priv->id, bus->name);
 	ret = clk_enable(&priv->clk);
 	if (ret && ret != -ENOSYS && ret != -EOPNOTSUPP) {
 		debug("%s: failed to enable clock\n", __func__);
 		return ret;
 	}
+	*/
 	priv->clk_rate = clk_get_rate(&priv->clk);
 
 	priv->base = (void *)devfdt_get_addr_ptr(bus);
 	k1_i2c_set_bus_speed(bus, priv->clk_rate);
+	log_info("%s, %d\n", __func__, __LINE__);
 	return 0;
 }
 

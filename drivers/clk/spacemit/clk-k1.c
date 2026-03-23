@@ -200,7 +200,8 @@ CCU_DDN_DEFINE(CLK_SLOW_UART2, slow_uart2_48, slow_uart2_48,
 	       "pll1_d4_614p4", MPMU_SUCCR_1,
 	       CCU_DDN_MASK(16, 13), 16, CCU_DDN_MASK(0, 13), 0, 2, 0);
 
-#if !IS_ENABLED(CONFIG_SPL_BUILD)
+//#if !IS_ENABLED(CONFIG_SPL_BUILD)
+#if 0
 CCU_GATE_DEFINE(CLK_WDT, wdt_clk, wdt_clk, "pll1_d96_25p6", MPMU_WDTPCR,
 		BIT(1), 0);
 
@@ -282,7 +283,8 @@ CCU_MUX_GATE_DEFINE(CLK_TWSI2, twsi2_clk, twsi2_clk, twsi_parents,
 CCU_GATE_DEFINE(CLK_TWSI8, twsi8_clk, twsi8_clk, "pll1_d78_31p5",
 		APBC_TWSI8_CLK_RST, BIT(1) | BIT(0), 0);
 
-#if !IS_ENABLED(CONFIG_SPL_BUILD)
+//#if !IS_ENABLED(CONFIG_SPL_BUILD)
+#if 0
 CCU_MUX_GATE_DEFINE(CLK_UART2, uart2_clk, uart2_clk, uart_clk_parents,
 		    ARRAY_SIZE(uart_clk_parents), APBC_UART2_CLK_RST,
 		    4, 3, BIT(1) | BIT(0), 0);
@@ -633,7 +635,8 @@ CCU_DIV_GATE_DEFINE(CLK_EMMC_X, emmc_x_clk, emmc_x_clk, "pll1_d2_1228p8",
 CCU_GATE_DEFINE(CLK_EMMC_BUS, emmc_bus_clk, emmc_bus_clk, "pmua_aclk",
 		APMU_PMUA_EM_CLK_RES_CTRL, BIT(3), 0);
 
-#if !IS_ENABLED(CONFIG_SPL_BUILD)
+//#if !IS_ENABLED(CONFIG_SPL_BUILD)
+#if 0
 static const char * const cci550_clk_parents[] = {
 	"pll1_d5_491p52",
 	"pll1_d4_614p4",
@@ -1133,7 +1136,8 @@ static const struct spacemit_ccu_data k1_ccu_pll_data = {
 	.offset		= K1_PLL_ID,
 };
 
-#if IS_ENABLED(CONFIG_SPL_BUILD)
+//#if IS_ENABLED(CONFIG_SPL_BUILD)
+#if 1
 static struct clk *k1_ccu_mpmu_clks[] = {
 	&pll1_d8_307p2.common.clk,
 	&pll1_d32_76p8.common.clk,
@@ -1211,7 +1215,8 @@ static const struct spacemit_ccu_data k1_ccu_mpmu_data = {
 	.offset		= K1_MPMU_ID,
 };
 
-#if IS_ENABLED(CONFIG_SPL_BUILD)
+//#if IS_ENABLED(CONFIG_SPL_BUILD)
+#if 1
 static struct clk *k1_ccu_apbc_clks[] = {
 	&uart0_clk.common.clk,
 	&twsi2_clk.common.clk,
@@ -1330,7 +1335,8 @@ static const struct spacemit_ccu_data k1_ccu_apbc_data = {
 	.offset		= K1_APBC_ID,
 };
 
-#if IS_ENABLED(CONFIG_SPL_BUILD)
+//#if IS_ENABLED(CONFIG_SPL_BUILD)
+#if 1
 static struct clk *k1_ccu_apmu_clks[] = {
 	&emmc_clk.common.clk,
 	&emmc_x_clk.common.clk,

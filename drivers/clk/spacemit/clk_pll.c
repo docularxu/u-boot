@@ -140,6 +140,7 @@ int spacemit_pll_init(struct ccu_common *common)
 	if (ret)
 		return ret;
 
+	printf("%s, %d, clk:0x%x, common:0x%x, name:%s\n", __func__, __LINE__, (u32)(uintptr_t)clk, (u32)(uintptr_t)common, common->name);
 	if (ccu_pll_lookup_matched_entry(pll))
 		return 0;
 

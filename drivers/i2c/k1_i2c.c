@@ -473,7 +473,7 @@ static int k1_i2c_probe(struct udevice *bus)
 	{
 		log_info("%s, %d\n", __func__, __LINE__);
 		void *pc = __builtin_return_address(0);                                                                                  
-		log_info("%s, %d, PC:0x%x, malloc_base:0x%llx\n", __func__, __LINE__, pc, gd->malloc_base); 
+		log_info("%s, %d, PC:0x%x, malloc_base:0x%x\n", __func__, __LINE__, pc, (u32)(uintptr_t)gd->malloc_base); 
 
 		int mmu_state = -1;
 		unsigned long satp;
@@ -506,14 +506,12 @@ static int k1_i2c_probe(struct udevice *bus)
 	if (ret)
 		return ret;
 
-	/*
 	log_info("%s, %d, priv->id:%d, bus->name:%s\n", __func__, __LINE__, priv->id, bus->name);
 	ret = clk_enable(&priv->clk);
 	if (ret && ret != -ENOSYS && ret != -EOPNOTSUPP) {
 		debug("%s: failed to enable clock\n", __func__);
 		return ret;
 	}
-	*/
 	priv->clk_rate = clk_get_rate(&priv->clk);
 
 	priv->base = (void *)devfdt_get_addr_ptr(bus);

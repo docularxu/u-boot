@@ -291,6 +291,7 @@ int regmap_init_mem(ofnode node, struct regmap **mapp)
 	}
 
 	map = regmap_alloc(count);
+	printf("%s, %d, map:0x%x\n", __func__, __LINE__, (u32)(uintptr_t)map);
 	if (!map)
 		return -ENOMEM;
 

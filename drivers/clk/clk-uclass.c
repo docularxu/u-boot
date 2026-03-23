@@ -88,6 +88,12 @@ static int clk_get_by_index_tail(int ret, ofnode node,
 	if (ret)
 		goto err;
 
+	printf("%s, %d, &node.np:0x%x, node.np:0x%x\n", __func__, __LINE__, (u32)(uintptr_t)&node.np, (u32)(uintptr_t)node.np);
+	if ((u32)(uintptr_t)node.np > 0x200000) {
+		printf("%s, %d, node name:0x%x\n", __func__, __LINE__, (u32)(uintptr_t)node.np->name);
+		printf("%s, %d, node name:%s\n", __func__, __LINE__, node.np->name);
+	}
+	//printf("%s, %d, node name:%s, full name:%s\n", __func__, __LINE__, args->node.np->name, args->node.np->full_name);
 	ret = uclass_get_device_by_ofnode(UCLASS_CLK, args->node, &dev_clk);
 	if (ret) {
 		debug("%s: uclass_get_device_by_of_offset failed: err=%d\n",
@@ -95,6 +101,7 @@ static int clk_get_by_index_tail(int ret, ofnode node,
 		return log_msg_ret("get", ret);
 	}
 
+	printf("%s, %d, clk:0x%x, dev_clk name:%s\n", __func__, __LINE__, (u32)(uintptr_t)clk, dev_clk->name);
 	clk->dev = dev_clk;
 
 	ops = clk_dev_ops(dev_clk);
@@ -142,6 +149,7 @@ static int clk_get_by_indexed_prop(struct udevice *dev, const char *prop_name,
 
 int clk_get_by_index(struct udevice *dev, int index, struct clk *clk)
 {
+	printf("%s, %d, dev name:%s, index:%d\n", __func__, __LINE__, dev->name, index);
 	return clk_get_by_index_nodev(dev_ofnode(dev), index, clk);
 }
 

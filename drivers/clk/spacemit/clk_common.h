@@ -72,6 +72,7 @@ static inline struct ccu_common *clk_to_ccu_common(struct clk *clk)
 #define ccu_update(c, reg, mask, val) \
 	({								\
 		struct ccu_common * const __ccu = (c);			\
+		printf("%s, %d, regmap:0x%x\n", __func__, __LINE__, (u32)(uintptr_t)__ccu->regmap);  \
 		regmap_update_bits(__ccu->regmap, __ccu->reg_##reg,	\
 				   mask, val);				\
 	})

@@ -44,6 +44,12 @@ int ccu_gate_enable(struct clk *clk)
 	struct ccu_mix *mix = clk_to_ccu_mix(clk);
 	struct ccu_gate_config *gate = &mix->gate;
 
+	printf("%s, %d, ", __func__, __LINE__);
+	printf("clk:0x%x, ", (u32)(uintptr_t)clk);
+	printf("common:0x%x, ", (u32)(uintptr_t)&mix->common);
+	printf("common->clk:0x%x, ", (u32)(uintptr_t)&mix->common.clk);
+	printf("common->name:%s, common->regmap:0x%x\n",
+		mix->common.name, (u32)(uintptr_t)mix->common.regmap);
 	ccu_update(&mix->common, ctrl, gate->mask, gate->mask);
 
 	return 0;
@@ -197,8 +203,18 @@ int spacemit_gate_init(struct ccu_common *common)
 {
 	struct clk *clk = &common->clk;
 
+#if 0
 	return clk_register(clk, UBOOT_DM_SPACEMIT_CLK_GATE,
 			    common->name, common->parents[0]);
+#else
+	{
+		int ret;
+		ret = clk_register(clk, UBOOT_DM_SPACEMIT_CLK_GATE,
+			    common->name, common->parents[0]);
+		printf("%s, %d, clk:0x%x, common:0x%x, name:%s\n", __func__, __LINE__, (u32)(uintptr_t)clk, (u32)(uintptr_t)common, common->name);
+		return ret;
+	}
+#endif
 }
 
 static const struct clk_ops spacemit_clk_gate_ops = {

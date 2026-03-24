@@ -1,23 +1,16 @@
 // SPDX-License-Identifier: GPL-2.0-or-later OR MIT
 /*
- * Copyright (C) 2024 Yangyu Chen <cyy@cyyself.name>
+ * Copyright (C) 2026 RISCstar Ltd.
  */
 
 #include "k1.dtsi"
-#include "binman.dtsi"
-#include "k1-pinctrl.dtsi"
 
 / {
-	model = "Banana Pi BPI-F3";
-	compatible = "bananapi,bpi-f3", "spacemit,k1";
+	model = "spacemit k1-x MUSE-Pi-Pro board";
+	compatible = "spacemit,muse-pi-pro", "spacemit,k1";
 
 	chosen {
 		stdout-path = "serial0";
-	};
-
-	memory@0 {
-		device_type = "memory";
-		reg = <0x00000000 0x00000000 0x00000000 0x80000000>;
 	};
 };
 
@@ -72,8 +65,6 @@
 
 &uart0 {
 	status = "okay";
-	pinctrl-names = "default";
-	pinctrl-0 = <&uart0_2_cfg>;
 };
 
 &i2c8 {

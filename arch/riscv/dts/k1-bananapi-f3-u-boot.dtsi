@@ -65,3 +65,11 @@
 		      "pll1_d78_31p5", "pll1_d4";
 	bootph-pre-ram;
 };
+
+&i2c2 {
+	bootph-pre-ram;
+
+	eeprom@50 {
+		bootph-pre-ram;
+	};
+};

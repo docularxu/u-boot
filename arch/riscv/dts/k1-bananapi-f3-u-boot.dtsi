@@ -64,3 +64,11 @@
 &syscon_apbc {
 	bootph-pre-ram;
 };
+
+&i2c2 {
+	bootph-pre-ram;
+
+	eeprom@50 {
+		bootph-pre-ram;
+	};
+};

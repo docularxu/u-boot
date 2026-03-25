@@ -6,6 +6,7 @@
  * dts/upstream/src/riscv/spacemit/k1-bananapi-f3.dts.
  */
 
+#include <dt-bindings/clock/spacemit,k1-syscon.h>
 #include "binman.dtsi"
 
 / {
@@ -21,5 +22,46 @@
 };
 
 &uart0 {
+	bootph-pre-ram;
+};
+
+&osc_32k {
+	bootph-pre-ram;
+};
+
+&vctcxo_1m {
+	bootph-pre-ram;
+};
+
+&vctcxo_3m {
+	bootph-pre-ram;
+};
+
+&vctcxo_24m {
+	bootph-pre-ram;
+};
+
+&syscon_mpmu {
+	bootph-pre-ram;
+};
+
+&pll {
+	bootph-pre-ram;
+};
+
+&syscon_apmu {
+	bootph-pre-ram;
+};
+
+/*
+ * U-Boot's clock driver resolves APBC parents through DT, while the kernel
+ * derives pll1_d78_31p5 / pll1_d4 internally with clk_register_fixed_factor.
+ * Extend the parent list here so the SPL/U-Boot APBC driver finds them.
+ */
+&syscon_apbc {
+	clocks = <&osc_32k>, <&vctcxo_1m>, <&vctcxo_3m>, <&vctcxo_24m>,
+		 <&syscon_mpmu CLK_PLL1_31P5>, <&pll CLK_PLL1_D4>;
+	clock-names = "osc", "vctcxo_1m", "vctcxo_3m", "vctcxo_24m",
+		      "pll1_d78_31p5", "pll1_d4";
 	bootph-pre-ram;
 };

@@ -185,3 +185,19 @@
 		};
 	};
 };
+
+&sdhci0 {
+	status = "okay";
+	bootph-pre-ram;
+	max-frequency = <204800000>;
+	bus-width = <4>;
+};
+
+&sdhci2 {
+	status = "okay";
+	bootph-pre-ram;
+	non-removable;
+	max-frequency = <204800000>;
+	no-sd;
+	bus-width = <8>;
+};

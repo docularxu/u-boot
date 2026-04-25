@@ -377,6 +377,10 @@ int board_fit_config_name_match(const char *name)
 		snprintf(fdt_name, I2C_BUF_SIZE, "%s_%s", "k1",
 			 &product_name[5]);
 	}
+	if (fdt_name[0] == '\0') {
+		/* set default board name */
+		sprintf(fdt_name, "k1_bananapi-f3");
+	}
 	for (i = 0; i < I2C_BUF_SIZE; i++) {
 		if (fdt_name[i] == '\0')
 			break;

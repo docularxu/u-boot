@@ -360,17 +360,6 @@
 			#reset-cells = <1>;
 		};
 
-		syscon_apbc: system-controller@d4015000 {
-			compatible = "spacemit,k1-syscon-apbc";
-			reg = <0x0 0xd4015000 0x0 0x1000>;
-			clocks = <&osc_32k>, <&vctcxo_1m>, <&vctcxo_3m>,
-				 <&vctcxo_24m>;
-			clock-names = "osc", "vctcxo_1m", "vctcxo_3m",
-				      "vctcxo_24m";
-			#clock-cells = <1>;
-			#reset-cells = <1>;
-		};
-
 		gpio: gpio@d4019000 {
 			compatible = "spacemit,k1-gpio";
 			reg = <0x0 0xd4019000 0x0 0x100>;
@@ -589,24 +578,24 @@
 			status = "disabled";
 		};
 
-		syscon_mpmu: system-controller@d4050000 {
-			compatible = "spacemit,k1-syscon-mpmu";
-			reg = <0x0 0xd4050000 0x0 0x209c>;
-			clocks = <&osc_32k>, <&vctcxo_1m>, <&vctcxo_3m>,
-				 <&vctcxo_24m>;
-			clock-names = "osc", "vctcxo_1m", "vctcxo_3m",
-				      "vctcxo_24m";
-			#clock-cells = <1>;
-			#power-domain-cells = <1>;
-			#reset-cells = <1>;
-		};
-
 		pll: clock-controller@d4090000 {
 			compatible = "spacemit,k1-pll";
 			reg = <0x0 0xd4090000 0x0 0x1000>;
 			clocks = <&vctcxo_24m>;
 			spacemit,mpmu = <&syscon_mpmu>;
 			#clock-cells = <1>;
+		};
+
+		syscon_mpmu: system-controller@d4050000 {
+			compatible = "spacemit,k1-syscon-mpmu";
+			reg = <0x0 0xd4050000 0x0 0x209c>;
+			clocks = <&osc_32k>, <&vctcxo_1m>, <&vctcxo_3m>,
+				 <&vctcxo_24m>, <&pll CLK_PLL1_D4>;
+			clock-names = "osc", "vctcxo_1m", "vctcxo_3m",
+				      "vctcxo_24m", "pll1_d4";
+			#clock-cells = <1>;
+			#power-domain-cells = <1>;
+			#reset-cells = <1>;
 		};
 
 		syscon_apmu: system-controller@d4282800 {
@@ -618,6 +607,20 @@
 				      "vctcxo_24m";
 			#clock-cells = <1>;
 			#power-domain-cells = <1>;
+			#reset-cells = <1>;
+		};
+
+		syscon_apbc: system-controller@d4015000 {
+			compatible = "spacemit,k1-syscon-apbc";
+			reg = <0x0 0xd4015000 0x0 0x1000>;
+			clocks = <&osc_32k>, <&vctcxo_1m>, <&vctcxo_3m>,
+				 <&vctcxo_24m>, <&pll CLK_PLL1_D4>,
+				 <&syscon_mpmu CLK_PLL1_31P5>,
+				 <&syscon_apmu CLK_PMUA_ACLK>;
+			clock-names = "osc", "vctcxo_1m", "vctcxo_3m",
+				      "vctcxo_24m", "pll1_d4",
+				      "pll1_d78_31p5", "pmua_aclk";
+			#clock-cells = <1>;
 			#reset-cells = <1>;
 		};
 

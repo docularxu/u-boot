@@ -38,21 +38,19 @@
 };
 
 &soc {
-	system-controller@d4050000 {
-		status = "okay";
-	};
 	clock-controller@d4090000 {
 		status = "okay";
+		bootph-all;
+	};
+	system-controller@d4050000 {
+		status = "okay";
+		bootph-all;
 	};
 	system-controller@d4282800 {
 		status = "okay";
+		bootph-all;
 	};
 	system-controller@d4015000 {
-		clocks = <&osc_32k>, <&vctcxo_1m>, <&vctcxo_3m>,
-			 <&vctcxo_24m>, <&syscon_mpmu CLK_PLL1_31P5>,
-			 <&pll CLK_PLL1_D4>;
-		clock-names = "osc", "vctcxo_1m", "vctcxo_3m",
-			      "vctcxo_24m", "pll1_d78_31p5", "pll1_d4";
 		status = "okay";
 	};
 

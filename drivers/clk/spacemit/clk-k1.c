@@ -1349,6 +1349,7 @@ static struct clk *k1_ccu_apmu_clks[] = {
 	&cpu_c1_ace_clk.common.clk,
 	&ccic_4x_clk.common.clk,
 	&ccic1phy_clk.common.clk,
+	&pmua_aclk.common.clk,
 	&sdh_axi_aclk.common.clk,
 	&sdh0_clk.common.clk,
 	&sdh1_clk.common.clk,
@@ -1366,7 +1367,6 @@ static struct clk *k1_ccu_apmu_clks[] = {
 	&emmc_x_clk.common.clk,
 	&audio_clk.common.clk,
 	&hdmi_mclk.common.clk,
-	&pmua_aclk.common.clk,
 	&pcie0_master_clk.common.clk,
 	&pcie0_slave_clk.common.clk,
 	&pcie0_dbi_clk.common.clk,
@@ -1534,16 +1534,11 @@ static int k1_clk_register(struct udevice *dev, struct regmap *regmap,
 	return 0;
 }
 
-static int k1_clk_probe(struct udevice *dev)
+static int k1_pll_clk_probe(struct udevice *dev)
 {
 	struct regmap *base_regmap, *lock_regmap = NULL;
 	const struct spacemit_ccu_data *data;
 	int ret;
-
-	clk_register_fixed_rate(NULL, "clock-1m", 1000000);
-	clk_register_fixed_rate(NULL, "clock-24m", 24000000);
-	clk_register_fixed_rate(NULL, "clock-3m", 3000000);
-	clk_register_fixed_rate(NULL, "clock-32k", 32000);
 
 	ret = regmap_init_mem(dev_ofnode(dev), &base_regmap);
 	if (ret)
@@ -1576,28 +1571,14 @@ static int k1_clk_probe(struct udevice *dev)
 	return k1_clk_retry_register();
 }
 
-static int k1_apbc_clk_probe(struct udevice *dev)
+static int k1_mpmu_clk_probe(struct udevice *dev)
 {
 	struct regmap *base_regmap, *lock_regmap = NULL;
 	const struct spacemit_ccu_data *data;
-	int ret;
 	struct clk clk;
-
-	ret = regmap_init_mem(dev_ofnode(dev), &base_regmap);
-	if (ret)
-		return ret;
-
-	clk_register_fixed_rate(NULL, "clock-1m", 1000000);
-	clk_register_fixed_rate(NULL, "clock-24m", 24000000);
-	clk_register_fixed_rate(NULL, "clock-3m", 3000000);
-	clk_register_fixed_rate(NULL, "clock-32k", 32000);
+	int ret;
 
 	/* probe PLL controller */
-	ret = clk_get_by_index(dev, 5, &clk);
-	if (ret)
-		return -EPROBE_DEFER;
-
-	/* probe MPMU controller */
 	ret = clk_get_by_index(dev, 4, &clk);
 	if (ret)
 		return -EPROBE_DEFER;
@@ -1606,23 +1587,61 @@ static int k1_apbc_clk_probe(struct udevice *dev)
 	if (ret)
 		return ret;
 
-	/*
-	 * The lock status of PLLs locate in MPMU region, while PLLs themselves
-	 * are in APBS region. Reference to MPMU syscon is required to check PLL
-	 * status.
-	 */
-	if (device_is_compatible(dev, "spacemit,k1-pll")) {
-		struct ofnode_phandle_args mpmu_args;
+	data = (struct spacemit_ccu_data *)dev_get_driver_data(dev);
 
-		ret = dev_read_phandle_with_args(dev, "spacemit,mpmu", NULL, 0, 0,
-						 &mpmu_args);
-		if (ret)
-			return ret;
+	ret = k1_clk_register(dev, base_regmap, lock_regmap, data);
+	if (ret)
+		return -EPROBE_DEFER;
 
-		ret = regmap_init_mem(mpmu_args.node, &lock_regmap);
-		if (ret)
-			return ret;
-	}
+	return k1_clk_retry_register();
+}
+
+static int k1_apmu_clk_probe(struct udevice *dev)
+{
+	struct regmap *base_regmap, *lock_regmap = NULL;
+	const struct spacemit_ccu_data *data;
+	int ret;
+
+	ret = regmap_init_mem(dev_ofnode(dev), &base_regmap);
+	if (ret)
+		return ret;
+
+	data = (struct spacemit_ccu_data *)dev_get_driver_data(dev);
+
+	ret = k1_clk_register(dev, base_regmap, lock_regmap, data);
+	if (ret)
+		return -EPROBE_DEFER;
+
+	return k1_clk_retry_register();
+}
+
+static int k1_apbc_clk_probe(struct udevice *dev)
+{
+	struct regmap *base_regmap, *lock_regmap = NULL;
+	const struct spacemit_ccu_data *data;
+	struct clk clk;
+	int ret;
+
+	/* probe PLL controller */
+	ret = clk_get_by_index(dev, 4, &clk);
+	if (ret)
+		return -EPROBE_DEFER;
+	/* probe MPMU controller */
+	ret = clk_get_by_index(dev, 5, &clk);
+	if (ret)
+		return -EPROBE_DEFER;
+	/* probe APMU controller */
+	ret = clk_get_by_index(dev, 6, &clk);
+	if (ret)
+		return -EPROBE_DEFER;
+
+	ret = regmap_init_mem(dev_ofnode(dev), &base_regmap);
+	if (ret)
+		return ret;
+
+	ret = regmap_init_mem(dev_ofnode(dev), &base_regmap);
+	if (ret)
+		return ret;
 
 	data = (struct spacemit_ccu_data *)dev_get_driver_data(dev);
 
@@ -1705,7 +1724,7 @@ U_BOOT_DRIVER(k1_pll_clk) = {
 	.name		= "k1_pll_clk",
 	.id		= UCLASS_CLK,
 	.of_match	= k1_pll_clk_match,
-	.probe		= k1_clk_probe,
+	.probe		= k1_pll_clk_probe,
 	.ops		= &k1_pll_clk_ops,
 	.flags		= DM_FLAG_PRE_RELOC,
 };
@@ -1722,7 +1741,7 @@ U_BOOT_DRIVER(k1_mpmu_clk) = {
 	.name		= "k1_mpmu_clk",
 	.id		= UCLASS_CLK,
 	.of_match	= k1_mpmu_clk_match,
-	.probe		= k1_clk_probe,
+	.probe		= k1_mpmu_clk_probe,
 	.ops		= &k1_mpmu_clk_ops,
 	.flags		= DM_FLAG_PRE_RELOC,
 };
@@ -1756,7 +1775,7 @@ U_BOOT_DRIVER(k1_apmu_clk) = {
 	.name		= "k1_apmu_clk",
 	.id		= UCLASS_CLK,
 	.of_match	= k1_apmu_clk_match,
-	.probe		= k1_clk_probe,
+	.probe		= k1_apmu_clk_probe,
 	.ops		= &k1_apmu_clk_ops,
 	.flags		= DM_FLAG_PRE_RELOC,
 };

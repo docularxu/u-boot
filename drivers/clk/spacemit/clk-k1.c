@@ -614,6 +614,29 @@ CCU_MUX_DIV_FC_DEFINE(CLK_PMUA_ACLK, pmua_aclk, pmua_aclk, pmua_aclk_parents,
 		      APMU_ACLK_CLK_CTRL, APMU_ACLK_CLK_CTRL, 1, 2, BIT(4),
 		      0, 1, 0);
 
+#if IS_ENABLED(CONFIG_SPL_BUILD)
+CCU_GATE_DEFINE(CLK_SDH_AXI, sdh_axi_aclk, sdh_axi_aclk, "pmua_aclk",
+		APMU_SDH0_CLK_RES_CTRL, BIT(3), 0);
+
+static const char * const sdh01_parents[] = {
+	"pll1_d6_409p6",
+};
+
+CCU_MUX_DIV_GATE_SPLIT_FC_DEFINE(CLK_SDH0, sdh0_clk, sdh0_clk, sdh01_parents,
+				 ARRAY_SIZE(sdh01_parents),
+				 APMU_SDH0_CLK_RES_CTRL,
+				 APMU_SDH0_CLK_RES_CTRL, 8, 3, BIT(11), 5, 3,
+				 BIT(4), 0);
+
+static const char * const sdh2_parents[] = {
+	"pll1_d6_409p6",
+};
+CCU_MUX_DIV_GATE_SPLIT_FC_DEFINE(CLK_SDH2, sdh2_clk, sdh2_clk, sdh2_parents,
+				 ARRAY_SIZE(sdh2_parents),
+				 APMU_SDH2_CLK_RES_CTRL,
+				 APMU_SDH2_CLK_RES_CTRL, 8, 3, BIT(11), 5, 3,
+				 BIT(4), 0);
+#else
 static const char * const emmc_parents[] = {
 	"pll1_d6_409p6",
 	"pll1_d4_614p4",
@@ -633,7 +656,6 @@ CCU_DIV_GATE_DEFINE(CLK_EMMC_X, emmc_x_clk, emmc_x_clk, "pll1_d2_1228p8",
 CCU_GATE_DEFINE(CLK_EMMC_BUS, emmc_bus_clk, emmc_bus_clk, "pmua_aclk",
 		APMU_PMUA_EM_CLK_RES_CTRL, BIT(3), 0);
 
-#if !IS_ENABLED(CONFIG_SPL_BUILD)
 static const char * const cci550_clk_parents[] = {
 	"pll1_d5_491p52",
 	"pll1_d4_614p4",
@@ -1332,10 +1354,10 @@ static const struct spacemit_ccu_data k1_ccu_apbc_data = {
 
 #if IS_ENABLED(CONFIG_SPL_BUILD)
 static struct clk *k1_ccu_apmu_clks[] = {
-	&emmc_clk.common.clk,
-	&emmc_x_clk.common.clk,
 	&pmua_aclk.common.clk,
-	&emmc_bus_clk.common.clk,
+	&sdh_axi_aclk.common.clk,
+	&sdh0_clk.common.clk,
+	&sdh2_clk.common.clk,
 };
 #else
 static struct clk *k1_ccu_apmu_clks[] = {

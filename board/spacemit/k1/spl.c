@@ -348,8 +348,7 @@ void nor_early_init(void)
 	udelay(10);
 	ret = uclass_get_device(UCLASS_SPI_FLASH, 0, &dev);
 	if (ret)
-		panic("Fail to detect spi nor flash.\n");
-	udelay(10);
+		log_info("Fail to detect spi nor flash.\n");
 }
 
 void board_init_f(ulong dummy)

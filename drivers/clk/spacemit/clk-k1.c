@@ -43,6 +43,18 @@ static const struct ccu_pll_rate_tbl pll1_rate_tbl[] = {
 	CCU_PLL_RATE(2457600000UL, 0x0050dd64, 0x330ccccd),
 };
 
+#if IS_ENABLED(CONFIG_SPL_BUILD)
+CCU_PLL_DEFINE(CLK_PLL1, pll1, pll1, "clock-24m", pll1_rate_tbl,
+	       APBS_PLL1_SWCR1, APBS_PLL1_SWCR3, MPMU_POSR, POSR_PLL1_LOCK,
+	       CLK_SET_RATE_GATE);
+
+CCU_FACTOR_GATE_DEFINE(CLK_PLL1_D4, pll1_d4, pll1_d4, "pll1", APBS_PLL1_SWCR2,
+		       BIT(3), 4, 1);
+CCU_FACTOR_GATE_DEFINE(CLK_PLL1_D6, pll1_d6, pll1_d6, "pll1", APBS_PLL1_SWCR2,
+		       BIT(5), 6, 1);
+CCU_FACTOR_GATE_FLAGS_DEFINE(CLK_PLL1_D8, pll1_d8, pll1_d8, "pll1",
+			     APBS_PLL1_SWCR2, BIT(7), 8, 1, CLK_IS_CRITICAL);
+#else
 static const struct ccu_pll_rate_tbl pll2_rate_tbl[] = {
 	CCU_PLL_RATE(3000000000UL, 0x0050dd66, 0x3fe00000),
 };
@@ -130,9 +142,23 @@ CCU_FACTOR_GATE_DEFINE(CLK_PLL3_D8, pll3_d8, pll3_d8, "pll3", APBS_PLL3_SWCR2,
 CCU_FACTOR_DEFINE(CLK_PLL3_20, pll3_20, pll3_20, "pll3_d8", 20, 1);
 CCU_FACTOR_DEFINE(CLK_PLL3_40, pll3_40, pll3_40, "pll3_d8", 10, 1);
 CCU_FACTOR_DEFINE(CLK_PLL3_80, pll3_80, pll3_80, "pll3_d8", 5, 1);
+#endif
 /* APBS clocks end */
 
 /* MPMU clocks start */
+#if IS_ENABLED(CONFIG_SPL_BUILD)
+CCU_GATE_DEFINE(CLK_PLL1_614, pll1_d4_614p4, pll1_d4_614p4, "pll1_d4",
+		MPMU_ACGR, BIT(15), 0);
+CCU_GATE_DEFINE(CLK_PLL1_409P6, pll1_d6_409p6, pll1_d6_409p6, "pll1_d6",
+		MPMU_ACGR, BIT(0), 0);
+CCU_GATE_DEFINE(CLK_PLL1_307P2, pll1_d8_307p2, pll1_d8_307p2, "pll1_d8",
+		MPMU_ACGR, BIT(13), 0);
+CCU_FACTOR_GATE_DEFINE(CLK_PLL1_31P5, pll1_d78_31p5, pll1_d78_31p5,
+		       "pll1_d4", MPMU_ACGR, BIT(6), 39, 2);
+CCU_DDN_DEFINE(CLK_SLOW_UART2, slow_uart2_48, slow_uart2_48,
+	       "pll1_d4_614p4", MPMU_SUCCR_1,
+	       CCU_DDN_MASK(16, 13), 16, CCU_DDN_MASK(0, 13), 0, 2, 0);
+#else
 CCU_GATE_DEFINE(CLK_PLL1_307P2, pll1_d8_307p2, pll1_d8_307p2, "pll1_d8",
 		MPMU_ACGR, BIT(13), 0);
 
@@ -200,7 +226,6 @@ CCU_DDN_DEFINE(CLK_SLOW_UART2, slow_uart2_48, slow_uart2_48,
 	       "pll1_d4_614p4", MPMU_SUCCR_1,
 	       CCU_DDN_MASK(16, 13), 16, CCU_DDN_MASK(0, 13), 0, 2, 0);
 
-#if !IS_ENABLED(CONFIG_SPL_BUILD)
 CCU_GATE_DEFINE(CLK_WDT, wdt_clk, wdt_clk, "pll1_d96_25p6", MPMU_WDTPCR,
 		BIT(1), 0);
 
@@ -255,6 +280,33 @@ CCU_GATE_DEFINE(CLK_RIPC, ripc_clk, ripc_clk, "apb_clk", MPMU_RIPCCR, 0x1, 0);
 /* MPMU clocks end */
 
 /* APBC clocks start */
+#if IS_ENABLED(CONFIG_SPL_BUILD)
+static const char * const uart_clk_parents[] = {
+	"clock-dummy",
+	"clock-dummy",
+	"slow_uart2_48",
+};
+
+CCU_MUX_GATE_DEFINE(CLK_UART0, uart0_clk, uart0_clk, uart_clk_parents,
+		    ARRAY_SIZE(uart_clk_parents), APBC_UART1_CLK_RST,
+		    4, 3, BIT(1) | BIT(0), 0);
+
+static const char * const twsi_parents[] = {
+	"pll1_d78_31p5",
+};
+
+CCU_MUX_GATE_DEFINE(CLK_TWSI2, twsi2_clk, twsi2_clk, twsi_parents,
+		    ARRAY_SIZE(twsi_parents), APBC_TWSI2_CLK_RST,
+		    4, 3, BIT(1) | BIT(0), 0);
+/*
+ * APBC_TWSI8_CLK_RST has a quirk that reading always results in zero.
+ * Combine functional and bus bits together as a gate to avoid sharing the
+ * write-only register between different clock hardwares.
+ */
+CCU_GATE_DEFINE(CLK_TWSI8, twsi8_clk, twsi8_clk, "pll1_d78_31p5",
+		APBC_TWSI8_CLK_RST, BIT(1) | BIT(0), 0);
+
+#else
 static const char * const uart_clk_parents[] = {
 	"pll1_m3d128_57p6",
 	"slow_uart1_14p74",
@@ -282,7 +334,6 @@ CCU_MUX_GATE_DEFINE(CLK_TWSI2, twsi2_clk, twsi2_clk, twsi_parents,
 CCU_GATE_DEFINE(CLK_TWSI8, twsi8_clk, twsi8_clk, "pll1_d78_31p5",
 		APBC_TWSI8_CLK_RST, BIT(1) | BIT(0), 0);
 
-#if !IS_ENABLED(CONFIG_SPL_BUILD)
 CCU_MUX_GATE_DEFINE(CLK_UART2, uart2_clk, uart2_clk, uart_clk_parents,
 		    ARRAY_SIZE(uart_clk_parents), APBC_UART2_CLK_RST,
 		    4, 3, BIT(1) | BIT(0), 0);
@@ -604,8 +655,9 @@ CCU_GATE_DEFINE(CLK_IPC_AP2AUD_BUS, ipc_ap2aud_bus_clk, ipc_ap2aud_bus_clk,
 /* APBC clocks end */
 
 /* APMU clocks start */
+#if IS_ENABLED(CONFIG_SPL_BUILD)
 static const char * const pmua_aclk_parents[] = {
-	"pll1_d10_245p76",
+	"clock-dummy",
 	"pll1_d8_307p2",
 };
 
@@ -614,7 +666,6 @@ CCU_MUX_DIV_FC_DEFINE(CLK_PMUA_ACLK, pmua_aclk, pmua_aclk, pmua_aclk_parents,
 		      APMU_ACLK_CLK_CTRL, APMU_ACLK_CLK_CTRL, 1, 2, BIT(4),
 		      0, 1, 0);
 
-#if IS_ENABLED(CONFIG_SPL_BUILD)
 CCU_GATE_DEFINE(CLK_SDH_AXI, sdh_axi_aclk, sdh_axi_aclk, "pmua_aclk",
 		APMU_SDH0_CLK_RES_CTRL, BIT(3), 0);
 
@@ -637,6 +688,16 @@ CCU_MUX_DIV_GATE_SPLIT_FC_DEFINE(CLK_SDH2, sdh2_clk, sdh2_clk, sdh2_parents,
 				 APMU_SDH2_CLK_RES_CTRL, 8, 3, BIT(11), 5, 3,
 				 BIT(4), 0);
 #else
+static const char * const pmua_aclk_parents[] = {
+	"pll1_d10_245p76",
+	"pll1_d8_307p2",
+};
+
+CCU_MUX_DIV_FC_DEFINE(CLK_PMUA_ACLK, pmua_aclk, pmua_aclk, pmua_aclk_parents,
+		      ARRAY_SIZE(pmua_aclk_parents),
+		      APMU_ACLK_CLK_CTRL, APMU_ACLK_CLK_CTRL, 1, 2, BIT(4),
+		      0, 1, 0);
+
 static const char * const emmc_parents[] = {
 	"pll1_d6_409p6",
 	"pll1_d4_614p4",
@@ -1111,6 +1172,14 @@ CCU_GATE_DEFINE(CLK_EMAC1_PTP, emac1_ptp_clk, emac1_ptp_clk, "pll2_d6",
 #endif
 /* APMU clocks end */
 
+#if IS_ENABLED(CONFIG_SPL_BUILD)
+static struct clk *k1_ccu_pll_clks[] = {
+	&pll1.common.clk,
+	&pll1_d4.common.clk,
+	&pll1_d6.common.clk,
+	&pll1_d8.common.clk,
+};
+#else
 static struct clk *k1_ccu_pll_clks[] = {
 	&pll1.common.clk,
 	&pll2.common.clk,
@@ -1148,6 +1217,7 @@ static struct clk *k1_ccu_pll_clks[] = {
 	&pll3_40.common.clk,
 	&pll3_20.common.clk,
 };
+#endif
 
 static const struct spacemit_ccu_data k1_ccu_pll_data = {
 	.clks		= k1_ccu_pll_clks,
@@ -1157,32 +1227,10 @@ static const struct spacemit_ccu_data k1_ccu_pll_data = {
 
 #if IS_ENABLED(CONFIG_SPL_BUILD)
 static struct clk *k1_ccu_mpmu_clks[] = {
-	&pll1_d8_307p2.common.clk,
-	&pll1_d32_76p8.common.clk,
-	&pll1_d40_61p44.common.clk,
-	&pll1_d16_153p6.common.clk,
-	&pll1_d24_102p4.common.clk,
-	&pll1_d48_51p2.common.clk,
-	&pll1_d48_51p2_ap.common.clk,
-	&pll1_m3d128_57p6.common.clk,
-	&pll1_d96_25p6.common.clk,
-	&pll1_d192_12p8.common.clk,
-	&pll1_d192_12p8_wdt.common.clk,
-	&pll1_d384_6p4.common.clk,
-	&pll1_d768_3p2.common.clk,
-	&pll1_d1536_1p6.common.clk,
-	&pll1_d3072_0p8.common.clk,
-	&pll1_d6_409p6.common.clk,
-	&pll1_d12_204p8.common.clk,
-	&pll1_d5_491p52.common.clk,
-	&pll1_d10_245p76.common.clk,
 	&pll1_d4_614p4.common.clk,
-	&pll1_d52_47p26.common.clk,
+	&pll1_d6_409p6.common.clk,
+	&pll1_d8_307p2.common.clk,
 	&pll1_d78_31p5.common.clk,
-	&pll1_d3_819p2.common.clk,
-	&pll1_d2_1228p8.common.clk,
-	&slow_uart.common.clk,
-	&slow_uart1_14p74.common.clk,
 	&slow_uart2_48.common.clk,
 };
 #else
@@ -1561,6 +1609,8 @@ static int k1_pll_clk_probe(struct udevice *dev)
 	struct regmap *base_regmap, *lock_regmap = NULL;
 	const struct spacemit_ccu_data *data;
 	int ret;
+
+	clk_register_fixed_rate(NULL, "clock-dummy", 0);
 
 	ret = regmap_init_mem(dev_ofnode(dev), &base_regmap);
 	if (ret)

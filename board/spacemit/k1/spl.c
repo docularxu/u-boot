@@ -27,7 +27,7 @@
 #define BOOT_PIN_SEL_REG	0xd4282c20
 
 #define BOOT_STRAP_MODE_OFFSET	9
-#define BOOT_STRAP_MODE_MASK	(3 << BOOT_STRAP_BIT_OFFSET)
+#define BOOT_STRAP_MODE_MASK	3
 #define BOOT_STRAP_MODE_EMMC	0
 #define BOOT_STRAP_MODE_SPI	1
 #define BOOT_STRAP_MODE_NAND	2
@@ -381,8 +381,10 @@ u32 spl_boot_device(void)
 	u32 mode, sel, ret;
 
 	mode = readl(boot_dev);
-	if (mode == BOOT_MODE_BOOTSTRAP) {
+	if (mode == BOOT_MODE_NONE || mode > BOOT_MODE_SD) {
 		sel = readl(boot_strap);
+		sel >>= BOOT_STRAP_MODE_OFFSET;
+		sel &= BOOT_STRAP_MODE_MASK;
 		switch (sel) {
 		case BOOT_STRAP_MODE_EMMC:
 			mode = BOOT_MODE_EMMC;

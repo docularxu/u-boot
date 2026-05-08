@@ -192,21 +192,25 @@
 };
 
 &sdhci0 {
-	status = "okay";
-	max-frequency = <204800000>;
 	bus-width = <4>;
-	vqmmc-supply = <&buck4_3v3>;
+	max-frequency = <204800000>;
 	cd-gpios = <&gpio 80 0>;
-	pinctrl-names = "default";
+	vqmmc-supply = <&buck4_3v3>;
+	pinctrl-names = "default", "fast";
 	pinctrl-0 = <&sdhci0_0_cfg>;
+	pinctrl-1 = <&sdhci0_1_cfg>;
+	status = "okay";
 };
 
 &sdhci2 {
-	status = "okay";
-	non-removable;
-	max-frequency = <204800000>;
-	no-sd;
 	bus-width = <8>;
+	mmc-hs400-1_8v;
+	mmc-hs400-enhanced-strobe;
+	max-frequency = <375000000>;
+	non-removable;
+	no-sd;
+	no-sdio;
 	vqmmc-supply = <&buck3_1v8>;
 	vmmc-supply = <&aldo1>;
+	status = "okay";
 };

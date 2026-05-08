@@ -1,0 +1,21 @@
+// SPDX-License-Identifier: GPL-2.0+ OR MIT
+/*
+ * U-Boot specifics for the Banana Pi BPI-F3 (Spacemit K1).
+ *
+ * Auto-included by the build on top of
+ * dts/upstream/src/riscv/spacemit/k1-bananapi-f3.dts.
+ */
+
+#include "binman.dtsi"
+
+/ {
+	/*
+	 * The kernel BPI-F3 dts intentionally has no memory@0 — kernels
+	 * obtain RAM extents from the bootloader. U-Boot needs the memory
+	 * node early, so carry it here.
+	 */
+	memory@0 {
+		device_type = "memory";
+		reg = <0x00000000 0x00000000 0x00000000 0x80000000>;
+	};
+};

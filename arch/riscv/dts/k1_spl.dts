@@ -141,7 +141,7 @@
 				bootph-pre-ram;
 			};
 
-			buck4 {
+			buck4_3v3: buck4 {
 				regulator-min-microvolt = <500000>;
 				regulator-max-microvolt = <3300000>;
 				regulator-ramp-delay = <5000>;
@@ -162,7 +162,7 @@
 				regulator-always-on;
 			};
 
-			aldo1 {
+			aldo1: aldo1 {
 				regulator-name = "vdd_1v8_mmc";
 				regulator-min-microvolt = <500000>;
 				regulator-max-microvolt = <3400000>;
@@ -238,18 +238,25 @@
 	};
 };
 
-&sdhci0 {
+&sd {
 	status = "okay";
 	bootph-pre-ram;
-	max-frequency = <204800000>;
 	bus-width = <4>;
+	cd-gpios = <&gpio 80 0>;
+	max-frequency = <204800000>;
+	vqmmc-supply = <&buck4_3v3>;
 };
 
-&sdhci2 {
+&emmc {
 	status = "okay";
 	bootph-pre-ram;
-	non-removable;
-	max-frequency = <204800000>;
-	no-sd;
 	bus-width = <8>;
+	max-frequency = <204800000>;
+	mmc-hs400-1_8v;
+	mmc-hs400-enhanced-strobe;
+	no-sd;
+	no-sdio;
+	non-removable;
+	vqmmc-supply = <&buck3_1v8>;
+	vmmc-supply = <&aldo1>;
 };

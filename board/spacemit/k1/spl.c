@@ -77,7 +77,7 @@ static void i2c_early_init(void)
 	}
 }
 
-int read_product_name(char *name, int size)
+static int read_product_name(char *name, int size)
 {
 	u8 eeprom_data[TLV_TOTAL_LEN_MAX], *p;
 	struct tlvinfo_header *tlv_hdr;
@@ -134,7 +134,7 @@ static void clk_early_init(void)
 		log_debug("clk: device not active, probing...\n");
 }
 
-void serial_early_init(void)
+static void serial_early_init(void)
 {
 	struct udevice *dev;
 	int ret;
@@ -201,7 +201,7 @@ static void set_vdd_mmc(void)
 	log_info("vdd_1v8_mmc, value:%d\n", ret);
 }
 
-void pmic_init(void)
+static void pmic_init(void)
 {
 	struct udevice *pmic_dev;
 	int ret;
@@ -224,7 +224,7 @@ static void ddr_cfg_init(struct ddr_cfg *cfg)
 	strcpy(cfg->type, DDR_DEFAULT_TYPE);
 }
 
-int read_ddr_info(struct ddr_cfg *cfg)
+static int read_ddr_info(struct ddr_cfg *cfg)
 {
 	u8 eeprom_data[TLV_TOTAL_LEN_MAX], *p;
 	struct tlvinfo_header *tlv_hdr;
@@ -276,7 +276,7 @@ int read_ddr_info(struct ddr_cfg *cfg)
 	return 0;
 }
 
-void ddr_early_init(void)
+static void ddr_early_init(void)
 {
 	void __iomem *src, *dst;
 	ulong pos, size;

@@ -253,7 +253,8 @@ int read_ddr_info(struct ddr_cfg *cfg)
 			found = true;
 			break;
 		case TLV_CODE_DDR_DATARATE:
-			memcpy(&cfg->data_rate, &tlv_entry->value[0], 2);
+			cfg->data_rate = ((u16)tlv_entry->value[0] << 8) |
+					 tlv_entry->value[1];
 			found = true;
 			break;
 		case TLV_CODE_DDR_TX_ODT:

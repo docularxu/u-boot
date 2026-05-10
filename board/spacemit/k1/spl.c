@@ -92,7 +92,7 @@ int read_product_name(char *name, int size)
 	if (ret)
 		return ret;
 	p = (u8 *)tlv_entry;
-	for (i = 0; i < tlv_hdr->totallen; ) {
+	for (i = 0; i < be16_to_cpu(tlv_hdr->totallen); ) {
 		if (tlv_entry->type == TLV_CODE_PRODUCT_NAME) {
 			if (tlv_entry->length < size)
 				size = tlv_entry->length;
@@ -241,7 +241,7 @@ int read_ddr_info(struct ddr_cfg *cfg)
 	if (ret)
 		return ret;
 	p = (u8 *)tlv_entry;
-	for (i = 0; i < tlv_hdr->totallen; ) {
+	for (i = 0; i < be16_to_cpu(tlv_hdr->totallen); ) {
 		switch (tlv_entry->type) {
 		case TLV_CODE_DDR_CSNUM:
 			memcpy(&cfg->cs_num, &tlv_entry->value[0], 1);

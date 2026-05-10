@@ -40,7 +40,6 @@ struct k1_i2c_msg {
 struct k1_i2c_priv {
 	int id;
 	void __iomem *base;
-	struct reset_ctl_bulk resets;
 	struct clk clk;
 };
 

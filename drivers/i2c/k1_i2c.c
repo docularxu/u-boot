@@ -42,7 +42,6 @@ struct k1_i2c_priv {
 	void __iomem *base;
 	struct reset_ctl_bulk resets;
 	struct clk clk;
-	u32 clk_rate;
 };
 
 /*
@@ -486,10 +485,11 @@ static int k1_i2c_probe(struct udevice *bus)
 		debug("%s: failed to enable clock\n", __func__);
 		return ret;
 	}
-	priv->clk_rate = clk_get_rate(&priv->clk);
-
 	priv->base = (void *)devfdt_get_addr_ptr(bus);
-	k1_i2c_set_bus_speed(bus, priv->clk_rate);
+	/*
+	 * Bus speed is programmed by the DM I2C uclass post_probe hook
+	 * from the DT clock-frequency property, so no explicit call here.
+	 */
 	return 0;
 }
 

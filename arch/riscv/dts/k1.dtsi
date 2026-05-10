@@ -944,7 +944,7 @@
 			#size-cells = <2>;
 			dma-ranges = <0x0 0x00000000 0x0 0x00000000 0x0 0x80000000>;
 
-			sdhci0: sdhci@d4280000 {
+			sd: sdhci@d4280000 {
 				compatible = "spacemit,k1-sdhci";
 				reg = <0x0 0xd4280000 0x0 0x200>;
 				clocks = <&syscon_apmu CLK_SDH_AXI>,
@@ -957,7 +957,7 @@
 				status = "disabled";
 			};
 
-			sdhci1: sdhci@d4280800 {
+			sdio: sdhci@d4280800 {
 				compatible = "spacemit,k1-sdhci";
 				reg = <0x0 0xd4280800 0x0 0x200>;
 				clocks = <&syscon_apmu CLK_SDH_AXI>,
@@ -970,7 +970,7 @@
 				status = "disabled";
 			};
 
-			sdhci2: sdhci@d4281000 {
+			emmc: sdhci@d4281000 {
 				compatible = "spacemit,k1-sdhci";
 				reg = <0x0 0xd4281000 0x0 0x200>;
 				clocks = <&syscon_apmu CLK_SDH_AXI>,

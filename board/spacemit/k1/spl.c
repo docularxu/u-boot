@@ -65,7 +65,7 @@ static void i2c_early_init(void)
 {
 	struct udevice *bus;
 
-	// eeprom: I2C2, pin group(GPIO_84, GPIO_85)
+	/* eeprom: I2C2, pin group(GPIO_84, GPIO_85) */
 	writel(I2C_PIN_CONFIG(MUX_MODE4), (void __iomem *)MFP_GPIO_84);
 	writel(I2C_PIN_CONFIG(MUX_MODE4), (void __iomem *)MFP_GPIO_85);
 	udelay(100);

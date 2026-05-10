@@ -107,13 +107,17 @@ static const struct p1_reg_info *get_buck_reg(struct udevice *pmic,
 static const struct p1_reg_info *get_aldo_reg(struct udevice *pmic,
 					      int idx, int uvolt)
 {
-	return &p1_aldos[idx];
+	if (idx < 1 || idx > ARRAY_SIZE(p1_aldos))
+		return NULL;
+	return &p1_aldos[idx - 1];
 }
 
 static const struct p1_reg_info *get_dldo_reg(struct udevice *pmic,
 					      int idx, int uvolt)
 {
-	return &p1_dldos[idx];
+	if (idx < 1 || idx > ARRAY_SIZE(p1_dldos))
+		return NULL;
+	return &p1_dldos[idx - 1];
 }
 
 static int buck_get_value(struct udevice *dev)

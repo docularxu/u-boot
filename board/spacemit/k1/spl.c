@@ -316,7 +316,7 @@ static void ddr_early_init(void)
 	if (readl((void __iomem *)0x00000000) == MAGIC_NUM)
 		log_info("DDR is ready\n");
 	else
-		log_info("DDR isn't invalid\n");
+		log_info("DDR is not ready\n");
 }
 
 void board_init_f(ulong dummy)

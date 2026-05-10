@@ -37,17 +37,6 @@ struct k1_i2c_msg {
 	u8 data;
 };
 
-struct k1_i2c {
-	u32 icr;
-	u32 isr;
-	u32 isar;
-	u32 idbr;
-	u32 ilcr;
-	u32 iwcr;
-	u32 irst_cyc;
-	u32 ibmr;
-};
-
 struct k1_i2c_priv {
 	int id;
 	void __iomem *base;
@@ -359,7 +348,7 @@ static int __i2c_read(void __iomem *base, uchar chip, u8 *addr, int alen,
 	return 0;
 }
 
-static int __i2c_write(struct k1_i2c *base, uchar chip, u8 *addr, int alen,
+static int __i2c_write(void __iomem *base, uchar chip, u8 *addr, int alen,
 		       uchar *buffer, int len)
 {
 	struct k1_i2c_msg msg;

@@ -152,6 +152,9 @@ static void set_vdd_core(void)
 	ret = regulator_get_by_platname("vdd_core", &dev);
 	if (ret)
 		panic("Fail to detect vdd_core (%d)\n", ret);
+	ret = regulator_set_value(dev, 900000);
+	if (ret)
+		log_warning("Fail to set vdd_core as 900000 (%d)\n", ret);
 	ret = regulator_set_enable(dev, true);
 	if (ret)
 		log_warning("Fail to enable vdd_core (%d)\n", ret);

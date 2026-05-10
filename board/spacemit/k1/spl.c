@@ -284,6 +284,8 @@ void ddr_early_init(void)
 
 	pos = binman_sym(ulong, ddr_fw, image_pos);
 	size = binman_sym(ulong, ddr_fw, size);
+	if (size == BINMAN_SYM_MISSING || size == 0)
+		panic("DDR firmware missing (binman ddr_fw size=0x%lx)\n", size);
 	src = (void __iomem *)pos;
 	dst = (void __iomem *)(DDR_FIRMWARE_BASE);
 	log_info("DDR firmware: [0x%lx]:0x%x, size:0x%lx\n", pos, readl(src), size);

@@ -303,11 +303,11 @@ static void spacemit_sdhci_set_aib_mmc1_io(struct sdhci_host *host, int voltage)
 		return;
 
 	aib_mmc1_io = map_sysmem((uintptr_t)plat->aib_mmc1_io_reg,
-				 sizeof(uintptr_t));
+				 sizeof(u32));
 	apbc_asfar = map_sysmem((uintptr_t)plat->apbc_asfar_reg,
-				sizeof(uintptr_t));
+				sizeof(u32));
 	apbc_assar = map_sysmem((uintptr_t)plat->apbc_assar_reg,
-				sizeof(uintptr_t));
+				sizeof(u32));
 
 	writel(AKEY_ASFAR, apbc_asfar);
 	writel(AKEY_ASSAR, apbc_assar);

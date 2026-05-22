@@ -33,16 +33,27 @@
 #define BOOT_STRAP_MODE_NAND	2
 #define BOOT_STRAP_MODE_SD	3
 
+#define MUX_MODE0		0
 #define MUX_MODE4		4
 #define EDGE_NONE		BIT(6)
 #define PULL_UP			(6 << 13)       /* bit[15:13] 110 */
+#define PULL_DOWN		(5 << 13)
 #define PAD_DS_MEDIUM		BIT(12)
 #define PAD_1V8_DS2		PAD_DS_MEDIUM
+#define PAD_3V_DS4		BIT(10)
 #define I2C_PIN_CONFIG(x)       ((x) | EDGE_NONE | PULL_UP | PAD_1V8_DS2)
+#define MMC_DAT_PIN_CONFIG(x)	((x) | EDGE_NONE | PULL_UP | PAD_3V_DS4)
+#define MMC_CLK_PIN_CONFIG(x)	((x) | EDGE_NONE | PULL_DOWN | PAD_3V_DS4)
 #define I2C_BUF_SIZE		64
 
 #define MFP_GPIO_84		0xd401e154
 #define MFP_GPIO_85		0xd401e158
+#define MFP_MMC1_DAT3		0xd401e1b8
+#define MFP_MMC1_DAT2		0xd401e1bc
+#define MFP_MMC1_DAT1		0xd401e1c0
+#define MFP_MMC1_DAT0		0xd401e1c4
+#define MFP_MMC1_CMD		0xd401e1c8
+#define MFP_MMC1_CLK		0xd401e1cc
 
 #define DDR_FIRMWARE_BASE	0xc082d000
 
@@ -347,6 +358,16 @@ void nor_early_init(void)
 	udelay(10);
 }
 
+void mmc_early_init(void)
+{
+	writel(MMC_DAT_PIN_CONFIG(MUX_MODE0), (void __iomem *)MFP_MMC1_DAT3);
+	writel(MMC_DAT_PIN_CONFIG(MUX_MODE0), (void __iomem *)MFP_MMC1_DAT2);
+	writel(MMC_DAT_PIN_CONFIG(MUX_MODE0), (void __iomem *)MFP_MMC1_DAT1);
+	writel(MMC_DAT_PIN_CONFIG(MUX_MODE0), (void __iomem *)MFP_MMC1_DAT0);
+	writel(MMC_DAT_PIN_CONFIG(MUX_MODE0), (void __iomem *)MFP_MMC1_CMD);
+	writel(MMC_DAT_PIN_CONFIG(MUX_MODE0), (void __iomem *)MFP_MMC1_CLK);
+}
+
 void board_init_f(ulong dummy)
 {
 	int ret;
@@ -372,6 +393,7 @@ void board_init_f(ulong dummy)
 
 	ddr_early_init();
 	nor_early_init();
+	mmc_early_init();
 }
 
 u32 spl_boot_device(void)

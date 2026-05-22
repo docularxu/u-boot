@@ -33,8 +33,6 @@ static void print_region(const char *name, phys_addr_t base, phys_addr_t size,
 	       (unsigned long long)end);
 	if (*uptop > end)
 		printf(" %13llx", (unsigned long long)(*uptop - end));
-	else
-		printf(" %13llx", (unsigned long long)(end - end));
 	putc('\n');
 	*uptop = base;
 }

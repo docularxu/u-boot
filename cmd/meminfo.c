@@ -39,23 +39,35 @@ static void print_region(const char *name, phys_addr_t base, phys_addr_t size,
 
 static void show_lmb(const struct lmb *lmb, phys_addr_t *uptop)
 {
-	int i;
+	int i, j;
+	phys_addr_t bank_top[CONFIG_NR_DRAM_BANKS];
+	struct bd_info *bd = gd->bd;
+
+	for (j = 0; j < CONFIG_NR_DRAM_BANKS; j++)
+		bank_top[j] = bd->bi_dram[j].start + bd->bi_dram[j].size;
 
 	for (i = lmb->used_mem.count - 1; i >= 0; i--) {
 		const struct lmb_region *rgn = alist_get(&lmb->used_mem, i,
 							 struct lmb_region);
 
+		for (j = 0; j < CONFIG_NR_DRAM_BANKS; j++) {
+			if (rgn->base >= bd->bi_dram[j].start &&
+			    rgn->base < bank_top[j])
+				break;
+		}
 		/*
 		 * Assume that the top lmb region is the U-Boot region, so just
 		 * take account of the memory not already reported
 		 */
 		if (lmb->used_mem.count - 1)
-			print_region("lmb", rgn->base, *uptop - rgn->base,
-				     uptop);
+			print_region("lmb", rgn->base, bank_top[j] - rgn->base,
+				     &bank_top[j]);
 		else
-			print_region("lmb", rgn->base, rgn->size, uptop);
-		*uptop = rgn->base;
+			print_region("lmb", rgn->base, rgn->size, &bank_top[j]);
+		bank_top[j] = rgn->base;
 	}
+
+	*uptop = bank_top[0];
 }
 
 static int do_meminfo(struct cmd_tbl *cmdtp, int flag, int argc,

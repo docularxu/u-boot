@@ -61,9 +61,9 @@ static void show_lmb(const struct lmb *lmb, phys_addr_t *uptop)
 			}
 		}
 		if (!get_bank) {
-			log_err("The region (base:0x%llx, size:0x%llx) does not exists in any DRAM bank.\n",
+			log_err("The region (base:0x%llx, size:0x%llx) does not exist in any DRAM bank.\n",
 				(unsigned long long)rgn->base, (unsigned long long)rgn->size);
-			return;
+			continue;
 		}
 		/*
 		 * Assume that the top lmb region is the U-Boot region, so just

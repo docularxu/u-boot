@@ -470,6 +470,9 @@ int board_fit_config_name_match(const char *name)
 	else if (!strncmp(product_name, "k1-x_deb1", 9))
 		snprintf(fdt_name, I2C_BUF_SIZE, "%s",
 			 "spacemit/k1-bananapi-f3");
+	else if (!strncmp(product_name, "k1-x_milkv-jupiter", 18))
+		snprintf(fdt_name, I2C_BUF_SIZE, "%s",
+			 "spacemit/k1-milkv-jupiter");
 	if (fdt_name[0] == '\0') {
 		/* set default board name */
 		sprintf(fdt_name, "spacemit/k1-musepi-pro");

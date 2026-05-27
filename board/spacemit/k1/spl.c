@@ -129,7 +129,7 @@ int read_product_name(char *name, int size)
 	return -ENOENT;
 }
 
-static void fixup_product_name(char *name, int size)
+static void fixup_product_name(void)
 {
 	char fdt_name[I2C_BUF_SIZE];
 	int i;
@@ -396,7 +396,7 @@ void board_init_f(ulong dummy)
 		log_info("Fail to detect board:%d\n", ret);
 	else
 		log_info("Get board name:%s\n", product_name);
-	fixup_product_name(product_name, I2C_BUF_SIZE);
+	fixup_product_name();
 	pmic_init();
 
 	ddr_early_init();

@@ -13,7 +13,6 @@
 #include <dm/device.h>
 #include <dm/uclass.h>
 #include <i2c.h>
-#include <linux/ctype.h>
 #include <linux/delay.h>
 #include <log.h>
 #include <power/regulator.h>
@@ -155,11 +154,6 @@ static void fixup_product_name(void)
 	if (fdt_name[0] == '\0') {
 		/* set default board name */
 		sprintf(fdt_name, "spacemit/k1-bananapi-f3");
-	}
-	for (i = 0; i < I2C_BUF_SIZE; i++) {
-		if (fdt_name[i] == '\0')
-			break;
-		fdt_name[i] = tolower(fdt_name[i]);
 	}
 	memset(product_name, 0, I2C_BUF_SIZE);
 	memcpy(product_name, fdt_name, I2C_BUF_SIZE);

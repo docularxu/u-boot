@@ -129,21 +129,29 @@ int read_product_name(char *name, int size)
 	return -ENOENT;
 }
 
+static const struct {
+	const char *eeprom_name;
+	const char *fit_name;
+} k1_board_map[] = {
+	{ "k1-x_MUSE-Pi-Pro",   "spacemit/k1-musepi-pro"    },
+	{ "k1-x_deb1",          "spacemit/k1-bananapi-f3"   },
+	{ "k1-x_milkv-jupiter", "spacemit/k1-milkv-jupiter" },
+};
+
 static void fixup_product_name(void)
 {
 	char fdt_name[I2C_BUF_SIZE];
 	int i;
 
 	memset(fdt_name, 0, I2C_BUF_SIZE);
-	if (!strncmp(product_name, "k1-x_MUSE-Pi-Pro", 16))
-		snprintf(fdt_name, I2C_BUF_SIZE, "%s",
-			 "spacemit/k1-musepi-pro");
-	else if (!strncmp(product_name, "k1-x_deb1", 9))
-		snprintf(fdt_name, I2C_BUF_SIZE, "%s",
-			 "spacemit/k1-bananapi-f3");
-	else if (!strncmp(product_name, "k1-x_milkv-jupiter", 18))
-		snprintf(fdt_name, I2C_BUF_SIZE, "%s",
-			 "spacemit/k1-milkv-jupiter");
+	for (i = 0; i < ARRAY_SIZE(k1_board_map); i++) {
+		if (!strncmp(product_name, k1_board_map[i].eeprom_name,
+			     strlen(k1_board_map[i].eeprom_name))) {
+			snprintf(fdt_name, I2C_BUF_SIZE, "%s",
+				 k1_board_map[i].fit_name);
+			break;
+		}
+	}
 	if (fdt_name[0] == '\0') {
 		/* set default board name */
 		sprintf(fdt_name, "spacemit/k1-bananapi-f3");

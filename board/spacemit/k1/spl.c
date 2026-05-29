@@ -377,32 +377,17 @@ void nor_early_init(void)
 	udelay(10);
 }
 
-void board_init_f(ulong dummy)
+int spl_board_init_f(void)
 {
-	int ret;
-
-	ret = spl_early_init();
-	if (ret)
-		panic("spl_early_init() failed:%d\n", ret);
-
-	riscv_cpu_setup();
-
 	clk_early_init();
 	serial_early_init();
 
-	preloader_console_init();
-
 	i2c_early_init();
-	ret = read_product_name(product_name, I2C_BUF_SIZE);
-	if (ret)
-		log_info("Fail to detect board:%d\n", ret);
-	else
-		log_info("Get board name:%s\n", product_name);
-	fixup_product_name();
 	pmic_init();
 
 	ddr_early_init();
 	nor_early_init();
+	return 0;
 }
 
 u32 spl_boot_device(void)
@@ -465,6 +450,14 @@ u32 spl_boot_device(void)
 
 void spl_board_init(void)
 {
+	int ret;
+
+	ret = read_product_name(product_name, I2C_BUF_SIZE);
+	if (ret)
+		log_info("Fail to detect board:%d\n", ret);
+	else
+		log_info("Get board name:%s\n", product_name);
+	fixup_product_name();
 }
 
 int board_fit_config_name_match(const char *name)

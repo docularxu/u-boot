@@ -167,8 +167,16 @@ static ulong mmc_write_blocks(struct mmc *mmc, lbaint_t start,
 		return 0;
 	else if (blkcnt == 1)
 		cmd.cmdidx = MMC_CMD_WRITE_SINGLE_BLOCK;
-	else
+	else {
+		if (mmc->host_caps & MMC_CAP_CMD23) {
+			cmd.cmdidx = MMC_CMD_SET_BLOCK_COUNT;
+			cmd.cmdarg = blkcnt & 0x0000ffff;
+			cmd.resp_type = MMC_RSP_R1;
+			if (mmc_send_cmd(mmc, &cmd, NULL))
+				return 0;
+		}
 		cmd.cmdidx = MMC_CMD_WRITE_MULTIPLE_BLOCK;
+	}
 
 	if (mmc->high_capacity)
 		cmd.cmdarg = start;
@@ -194,7 +202,8 @@ static ulong mmc_write_blocks(struct mmc *mmc, lbaint_t start,
 	/* SPI multiblock writes terminate using a special
 	 * token, not a STOP_TRANSMISSION request.
 	 */
-	if (!mmc_host_is_spi(mmc) && blkcnt > 1) {
+	if (!mmc_host_is_spi(mmc) && blkcnt > 1 &&
+	    !(mmc->host_caps & MMC_CAP_CMD23)) {
 		cmd.cmdidx = MMC_CMD_STOP_TRANSMISSION;
 		cmd.cmdarg = 0;
 		cmd.resp_type = MMC_RSP_R1b;

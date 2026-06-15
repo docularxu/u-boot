@@ -461,9 +461,16 @@ static int mmc_read_blocks(struct mmc *mmc, void *dst, lbaint_t start,
 	struct mmc_cmd cmd;
 	struct mmc_data data;
 
-	if (blkcnt > 1)
+	if (blkcnt > 1) {
+		if (mmc->host_caps & MMC_CAP_CMD23) {
+			cmd.cmdidx = MMC_CMD_SET_BLOCK_COUNT;
+			cmd.cmdarg = blkcnt & 0x0000ffff;
+			cmd.resp_type = MMC_RSP_R1;
+			if (mmc_send_cmd(mmc, &cmd, NULL))
+				return 0;
+		}
 		cmd.cmdidx = MMC_CMD_READ_MULTIPLE_BLOCK;
-	else
+	} else
 		cmd.cmdidx = MMC_CMD_READ_SINGLE_BLOCK;
 
 	if (mmc->high_capacity)
@@ -481,7 +488,7 @@ static int mmc_read_blocks(struct mmc *mmc, void *dst, lbaint_t start,
 	if (mmc_send_cmd(mmc, &cmd, &data))
 		return 0;
 
-	if (blkcnt > 1) {
+	if (blkcnt > 1 && !(mmc->host_caps & MMC_CAP_CMD23)) {
 		if (mmc_send_stop_transmission(mmc, false)) {
 #if !defined(CONFIG_XPL_BUILD) || defined(CONFIG_SPL_LIBCOMMON_SUPPORT)
 			log_err("mmc fail to send stop cmd\n");
@@ -1044,6 +1051,9 @@ static int mmc_get_capabilities(struct mmc *mmc)
 	if (mmc->version < MMC_VERSION_4)
 		return 0;
 
+	if (mmc->version < MMC_VERSION_4_3)
+		mmc->host_caps &= ~MMC_CAP_CMD23;
+
 	if (!ext_csd) {
 		log_err("No ext_csd found!\n"); /* this should never happen */
 		return -ENOTSUPP;
@@ -1436,6 +1446,8 @@ static int sd_get_capabilities(struct mmc *mmc)
 
 	if (mmc->scr[0] & SD_DATA_4BIT)
 		mmc->card_caps |= MMC_MODE_4BIT;
+	if (!(mmc->scr[0] & SD_SCR_CMD23_SUPPORT))
+		mmc->host_caps &= ~MMC_CAP_CMD23;
 
 	/* Version 1.0 doesn't support switching */
 	if (mmc->version == SD_VERSION_1_0)

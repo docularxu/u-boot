@@ -141,6 +141,8 @@ static inline bool mmc_is_tuning_cmd(uint cmdidx)
 #define SD_HIGHSPEED_BUSY	0x00020000
 #define SD_HIGHSPEED_SUPPORTED	0x00020000
 
+#define SD_SCR_CMD23_SUPPORT	BIT(1)
+
 #define UHS_SDR12_BUS_SPEED	0
 #define HIGH_SPEED_BUS_SPEED	1
 #define UHS_SDR25_BUS_SPEED	1
@@ -343,7 +345,8 @@ static inline bool mmc_is_tuning_cmd(uint cmdidx)
 
 #define MMC_QUIRK_RETRY_SEND_CID	BIT(0)
 #define MMC_QUIRK_RETRY_SET_BLOCKLEN	BIT(1)
-#define MMC_QUIRK_RETRY_APP_CMD	BIT(2)
+#define MMC_QUIRK_RETRY_APP_CMD		BIT(2)
+#define MMC_QUIRK_BLK_CMD23		BIT(3)
 
 enum mmc_voltage {
 	MMC_SIGNAL_VOLTAGE_000 = 0,

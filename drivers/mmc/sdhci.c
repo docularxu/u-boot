@@ -741,6 +741,9 @@ static int sdhci_init(struct mmc *mmc)
 		}
 	}
 #endif
+	if (IS_ENABLED(CONFIG_MMC_QUIRKS) &&
+	    (host->quirks & SDHCI_QUIRK_BLK_CMD23))
+		host->mmc->quirks |= MMC_QUIRK_BLK_CMD23;
 
 	sdhci_set_power(host, fls(mmc->cfg->voltages) - 1);
 

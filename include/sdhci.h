@@ -256,6 +256,7 @@
 #define SDHCI_QUIRK_SUPPORT_SINGLE	(1 << 10)
 /* Capability register bit-63 indicates HS400 support */
 #define SDHCI_QUIRK_CAPS_BIT63_FOR_HS400	BIT(11)
+#define SDHCI_QUIRK_BLK_CMD23		BIT(12)
 
 /* to make gcc happy */
 struct sdhci_host;

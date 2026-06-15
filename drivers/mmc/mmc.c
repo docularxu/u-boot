@@ -461,6 +461,15 @@ static int mmc_read_blocks(struct mmc *mmc, void *dst, lbaint_t start,
 	struct mmc_cmd cmd;
 	struct mmc_data data;
 
+	if (IS_ENABLED(CONFIG_MMC_QUIRKS) &&
+	    (mmc->quirks & MMC_QUIRK_BLK_CMD23)) {
+		cmd.cmdidx = MMC_CMD_SET_BLOCK_COUNT;
+		cmd.cmdarg = blkcnt & 0x0000ffff;
+		cmd.resp_type = MMC_RSP_R1;
+		if (mmc_send_cmd(mmc, &cmd, NULL))
+			return 0;
+	}
+
 	if (blkcnt > 1)
 		cmd.cmdidx = MMC_CMD_READ_MULTIPLE_BLOCK;
 	else
@@ -481,7 +490,9 @@ static int mmc_read_blocks(struct mmc *mmc, void *dst, lbaint_t start,
 	if (mmc_send_cmd(mmc, &cmd, &data))
 		return 0;
 
-	if (blkcnt > 1) {
+	if (blkcnt > 1 &&
+	    IS_ENABLED(CONFIG_MMC_QUIRKS) &&
+	    !(mmc->quirks & MMC_QUIRK_BLK_CMD23)) {
 		if (mmc_send_stop_transmission(mmc, false)) {
 #if !defined(CONFIG_XPL_BUILD) || defined(CONFIG_SPL_LIBCOMMON_SUPPORT)
 			log_err("mmc fail to send stop cmd\n");
@@ -1436,6 +1447,9 @@ static int sd_get_capabilities(struct mmc *mmc)
 
 	if (mmc->scr[0] & SD_DATA_4BIT)
 		mmc->card_caps |= MMC_MODE_4BIT;
+	if (IS_ENABLED(CONFIG_MMC_QUIRKS) &&
+	    !(mmc->scr[0] & SD_SCR_CMD23_SUPPORT))
+		mmc->quirks &= ~MMC_QUIRK_BLK_CMD23;
 
 	/* Version 1.0 doesn't support switching */
 	if (mmc->version == SD_VERSION_1_0)
@@ -2963,9 +2977,9 @@ int mmc_get_op_cond(struct mmc *mmc, bool quiet)
 		return err;
 
 #ifdef CONFIG_MMC_QUIRKS
-	mmc->quirks = MMC_QUIRK_RETRY_SET_BLOCKLEN |
-		      MMC_QUIRK_RETRY_SEND_CID |
-		      MMC_QUIRK_RETRY_APP_CMD;
+	mmc->quirks |= MMC_QUIRK_RETRY_SET_BLOCKLEN |
+		       MMC_QUIRK_RETRY_SEND_CID |
+		       MMC_QUIRK_RETRY_APP_CMD;
 #endif
 
 	err = mmc_power_cycle(mmc);

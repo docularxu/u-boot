@@ -1,6 +1,6 @@
 config PINCTRL_SPACEMIT_K1
 	bool "Spacemit K1 SoC pinctrl driver"
-	depends on PINCTRL_GENERIC && DM
+	depends on PINCTRL_GENERIC && DM && SYSCON
 	help
 	  Supports pin multiplexing control on Spacemit K1 SoCs.
 

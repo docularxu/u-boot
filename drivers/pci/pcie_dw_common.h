@@ -40,8 +40,11 @@
 #define PCIE_ATU_TYPE_IO		(0x2 << 0)
 #define PCIE_ATU_TYPE_CFG0		(0x4 << 0)
 #define PCIE_ATU_TYPE_CFG1		(0x5 << 0)
+#define PCIE_ATU_REGION_INBOUND		(0x1 << 31)
+#define PCIE_ATU_REGION_OUTBOUND	(0x0 << 31)
 #define PCIE_ATU_ENABLE			(0x1 << 31)
 #define PCIE_ATU_BAR_MODE_ENABLE	(0x1 << 30)
+#define PCIE_ATU_BAR_NUM(bar)		(((bar) & 0x7) << 24)
 #define PCIE_ATU_BUS(x)			(((x) & 0xff) << 24)
 #define PCIE_ATU_DEV(x)			(((x) & 0x1f) << 19)
 #define PCIE_ATU_FUNC(x)		(((x) & 0x7) << 16)
@@ -141,6 +144,9 @@ void dw_pcie_link_set_max_link_width(struct pcie_dw *pci, u32 num_lanes);
 
 int pcie_dw_prog_outbound_atu_unroll(struct pcie_dw *pci, int index, int type, u64 cpu_addr,
 				     u64 pci_addr, u32 size);
+
+int pcie_dw_prog_inbound_atu_unroll(struct pcie_dw *pci, int index, int type,
+				    u64 pci_addr, u64 cpu_addr, u32 size);
 
 int pcie_dw_read_config(const struct udevice *bus, pci_dev_t bdf, uint offset, ulong *valuep,
 			enum pci_size_t size);

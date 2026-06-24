@@ -145,6 +145,62 @@ int pcie_dw_prog_outbound_atu_unroll(struct pcie_dw *pci, int index,
 }
 
 /**
+ * pcie_dw_prog_inbound_atu_unroll() - Configure ATU for inbound accesses
+ *
+ * @pcie: Pointer to the PCI controller state
+ * @index: ATU region index
+ * @type: ATU access type
+ * @pci_addr: the PCIe bus address start for the translation
+ * @cpu_addr: the CPU physical address target for the translation
+ * @size: the size of the translation window
+ *
+ * Configures an inbound ATU window so that PCIe devices can DMA to
+ * system memory.  Inbound semantics swap BASE and TARGET relative to
+ * outbound: BASE is the PCIe bus address (where the DMA comes from),
+ * TARGET is the CPU physical address (where it lands in DRAM).
+ *
+ * Return: 0 on success, -1 on failure
+ */
+int pcie_dw_prog_inbound_atu_unroll(struct pcie_dw *pci, int index, int type,
+				    u64 pci_addr, u64 cpu_addr, u32 size)
+{
+	u32 retries, val;
+
+	dev_dbg(pci->dev,
+		"inbound ATU: index:%d type:%d pci_addr:%8llx cpu_addr:%8llx size:%8x\n",
+		index, type, pci_addr, cpu_addr, size);
+
+	dw_pcie_writel_ob_unroll(pci, index, PCIE_ATU_UNR_LOWER_BASE,
+				 lower_32_bits(pci_addr));
+	dw_pcie_writel_ob_unroll(pci, index, PCIE_ATU_UNR_UPPER_BASE,
+				 upper_32_bits(pci_addr));
+	dw_pcie_writel_ob_unroll(pci, index, PCIE_ATU_UNR_LIMIT,
+				 lower_32_bits(pci_addr + size - 1));
+	dw_pcie_writel_ob_unroll(pci, index, PCIE_ATU_UNR_UPPER_LIMIT,
+				 upper_32_bits(pci_addr + size - 1));
+	dw_pcie_writel_ob_unroll(pci, index, PCIE_ATU_UNR_LOWER_TARGET,
+				 lower_32_bits(cpu_addr));
+	dw_pcie_writel_ob_unroll(pci, index, PCIE_ATU_UNR_UPPER_TARGET,
+				 upper_32_bits(cpu_addr));
+	dw_pcie_writel_ob_unroll(pci, index, PCIE_ATU_UNR_REGION_CTRL1,
+				 type | PCIE_ATU_REGION_INBOUND);
+	dw_pcie_writel_ob_unroll(pci, index, PCIE_ATU_UNR_REGION_CTRL2,
+				 PCIE_ATU_ENABLE);
+
+	for (retries = 0; retries < LINK_WAIT_MAX_IATU_RETRIES; retries++) {
+		val = dw_pcie_readl_ob_unroll(pci, index,
+					     PCIE_ATU_UNR_REGION_CTRL2);
+		if (val & PCIE_ATU_ENABLE)
+			return 0;
+
+		udelay(LINK_WAIT_IATU);
+	}
+	dev_err(pci->dev, "inbound iATU is not being enabled\n");
+
+	return -1;
+}
+
+/**
  * set_cfg_address() - Configure the PCIe controller config space access
  *
  * @pcie: Pointer to the PCI controller state

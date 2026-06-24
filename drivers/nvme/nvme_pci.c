@@ -31,8 +31,9 @@ static int nvme_probe(struct udevice *udev)
 	ndev->bar = dm_pci_map_bar(udev, PCI_BASE_ADDRESS_0, 0, 0,
 				   PCI_REGION_TYPE, PCI_REGION_MEM);
 
-	/* Turn on bus-mastering */
-	dm_pci_clrset_config16(udev, PCI_COMMAND, 0, PCI_COMMAND_MASTER);
+	/* Turn on bus-mastering and memory space */
+	dm_pci_clrset_config16(udev, PCI_COMMAND, 0,
+			       PCI_COMMAND_MASTER | PCI_COMMAND_MEMORY);
 
 	return nvme_init(udev);
 }

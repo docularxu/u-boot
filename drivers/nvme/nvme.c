@@ -27,6 +27,14 @@
 #define IO_TIMEOUT		30
 #define MAX_PRP_POOL		512
 
+/* Fixed low-memory DMA buffers at 1MB for admin queues.
+ * Works around PCIe RC inbound DMA limitation on Spacemit K1
+ * where high DRAM addresses are unreachable by NVMe controller.
+ */
+#define NVME_ADMIN_DMA_BASE	0x100000
+static u8 *admin_sq_buf = (u8 *)NVME_ADMIN_DMA_BASE;
+static u8 *admin_cq_buf = (u8 *)(NVME_ADMIN_DMA_BASE + 0x1000);
+
 static int nvme_wait_csts(struct nvme_dev *dev, u32 mask, u32 val)
 {
 	int timeout;
@@ -233,14 +241,19 @@ static struct nvme_queue *nvme_alloc_queue(struct nvme_dev *dev,
 		return NULL;
 	memset(nvmeq, 0, sizeof(*nvmeq));
 
-	nvmeq->cqes = (void *)memalign(4096, NVME_CQ_ALLOCATION);
-	if (!nvmeq->cqes)
-		goto free_nvmeq;
+	if (qid == NVME_ADMIN_Q) {
+		/* Use static low-memory buffers for admin queues */
+		nvmeq->cqes = (void *)admin_cq_buf;
+		nvmeq->sq_cmds = (void *)admin_sq_buf;
+	} else {
+		nvmeq->cqes = (void *)memalign(4096, NVME_CQ_ALLOCATION);
+		if (!nvmeq->cqes)
+			goto free_nvmeq;
+		nvmeq->sq_cmds = (void *)memalign(4096, NVME_SQ_SIZE(depth));
+		if (!nvmeq->sq_cmds)
+			goto free_queue;
+	}
 	memset((void *)nvmeq->cqes, 0, NVME_CQ_SIZE(depth));
-
-	nvmeq->sq_cmds = (void *)memalign(4096, NVME_SQ_SIZE(depth));
-	if (!nvmeq->sq_cmds)
-		goto free_queue;
 	memset((void *)nvmeq->sq_cmds, 0, NVME_SQ_SIZE(depth));
 
 	nvmeq->dev = dev;
@@ -317,8 +330,10 @@ static int nvme_shutdown_ctrl(struct nvme_dev *dev)
 
 static void nvme_free_queue(struct nvme_queue *nvmeq)
 {
-	free((void *)nvmeq->cqes);
-	free(nvmeq->sq_cmds);
+	if (nvmeq->qid != NVME_ADMIN_Q) {
+		free((void *)nvmeq->cqes);
+		free(nvmeq->sq_cmds);
+	}
 	free(nvmeq);
 }
 

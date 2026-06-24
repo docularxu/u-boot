@@ -12,6 +12,7 @@
 #include <configs/k1.h>
 #include <dm/device.h>
 #include <dm/uclass.h>
+#include <env.h>
 #include <i2c.h>
 #include <linux/bitfield.h>
 #include <linux/delay.h>
@@ -96,39 +97,6 @@ static void i2c_early_init(void)
 	}
 }
 
-int read_product_name(char *name, int size)
-{
-	u8 eeprom_data[TLV_TOTAL_LEN_MAX], *p;
-	struct tlvinfo_header *tlv_hdr;
-	struct tlvinfo_tlv *tlv_entry;
-	int ret, i = 0;
-	u32 entry_size;
-
-	if (!name || size <= 0)
-		return -EINVAL;
-	ret = read_tlvinfo_tlv_eeprom(eeprom_data, &tlv_hdr,
-				      &tlv_entry, i);
-	if (ret)
-		return ret;
-	p = (u8 *)tlv_entry;
-	for (i = 0; i < tlv_hdr->totallen; ) {
-		if (tlv_entry->type == TLV_CODE_PRODUCT_NAME) {
-			if (tlv_entry->length < size)
-				size = tlv_entry->length;
-			memset(name, 0, size);
-			memcpy(name, &tlv_entry->value[0], size);
-			return 0;
-		}
-		if (tlv_entry->type == TLV_CODE_CRC_32)
-			return -ENOENT;
-		entry_size = tlv_entry->length + sizeof(struct tlvinfo_tlv);
-		i += entry_size;
-		p += entry_size;
-		tlv_entry = (struct tlvinfo_tlv *)p;
-	}
-	return -ENOENT;
-}
-
 static const struct {
 	const char *eeprom_name;
 	const char *fit_name;
@@ -140,9 +108,15 @@ static const struct {
 
 static void fixup_product_name(void)
 {
-	char fdt_name[I2C_BUF_SIZE];
+	char fdt_name[I2C_BUF_SIZE], *name;
 	int i;
 
+	memset(product_name, 0, I2C_BUF_SIZE);
+	env_init();
+	env_load();
+	name = env_get("product_name");
+	if (name)
+		snprintf(product_name, I2C_BUF_SIZE, "%s", name);
 	memset(fdt_name, 0, I2C_BUF_SIZE);
 	for (i = 0; i < ARRAY_SIZE(k1_board_map); i++) {
 		if (!strncmp(product_name, k1_board_map[i].eeprom_name,
@@ -451,13 +425,10 @@ u32 spl_boot_device(void)
 
 void spl_board_init(void)
 {
-	int ret;
+}
 
-	ret = read_product_name(product_name, I2C_BUF_SIZE);
-	if (ret)
-		log_info("Fail to detect board:%d\n", ret);
-	else
-		log_info("Get board name:%s\n", product_name);
+void spl_perform_board_fixups(struct spl_image_info *spl_image)
+{
 	fixup_product_name();
 }
 

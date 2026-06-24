@@ -301,8 +301,8 @@
 	 * when the endpoint does not actively drive it low.  Without a valid
 	 * CLKREQ# the controller will not complete link training.
 	 */
-	/* pinctrl-names = "default"; */
-	/* pinctrl-0 = <&pcie1_3_cfg>; */
+	pinctrl-names = "default";
+	pinctrl-0 = <&pcie1_3_cfg>;
 	status = "okay";
 };
 
@@ -310,8 +310,8 @@
 	/*
 	 * pinctrl must stay disabled on PHY nodes (see pcie1_phy above).
 	 */
-	/* pinctrl-names = "default"; */
-	/* pinctrl-0 = <&pcie2_4_cfg>; */
+	pinctrl-names = "default";
+	pinctrl-0 = <&pcie2_4_cfg>;
 	status = "okay";
 };
 
